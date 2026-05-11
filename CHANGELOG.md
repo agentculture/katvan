@@ -7,6 +7,19 @@ project does not yet ship a Python package, so the versions below are
 documentation milestones rather than published artifacts; CI version
 gating arrives when/if katvan grows a packaging story.
 
+## [Unreleased]
+
+### Added
+
+- `.github/workflows/sonarcloud.yml` and `sonar-project.properties` —
+  SonarCloud scan on PR + push to main. Closes the gap where the
+  vendored `cicd` skill's `status` / `await` extensions expected a
+  Sonar scan that wasn't being produced. Scan-only (no pytest /
+  coverage) to match the current greenfield-repo posture documented in
+  `.claude/skills/cicd/SKILL.md`; the workflow gates on
+  `env.SONAR_TOKEN != ''` so a missing secret no-ops rather than
+  failing PRs.
+
 ## [0.1.0] - 2026-05-12
 
 ### Added
