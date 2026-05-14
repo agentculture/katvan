@@ -38,12 +38,22 @@ re-vendor explicitly via the recipe in the broadcast brief.
 - **Record divergence.** Any change beyond identifier-only goes in
   the row's "Notes" cell.
 
+## Katvan-original skills
+
+These skills were **authored in katvan** — they are not vendored from
+anywhere. Katvan is the canonical upstream for them. If a sibling repo
+adopts one, record the consumer in the `Downstream copies` cell so
+future `steward announce-skill-update` broadcasts find them.
+
+| Skill | Origin | Notes | Downstream copies |
+|-------|--------|-------|-------------------|
+| `librarian` | **katvan-original** (authored here; canonical-here) | Cross-repo docs maintenance for the culture.dev site: `overview` / `pull` / `doctor`. Pulls sibling repos' raw-markdown `docs/` into `site/docs/<repo>/` with Jekyll frontmatter injection; `doctor` files dedup'd issues on the source repos via the `communicate` skill's scripts. Depends on the `docs_mode:` key in `site/_data/agentculture_repos.yml` and the `communicate` skill. Phase 1 of a two-phase plan — Phase 2 migrates these scripts into a `katvan` Python CLI. | none yet |
+
 ## Downstream copies of katvan-owned skills
 
-Katvan does not own any canonical skills today. If that changes (e.g.
-a docs-site-specific helper that another sibling adopts), add a
-`Downstream copies` cell to that row so future broadcasts find them
-automatically.
+`librarian` (above) is katvan's first canonical skill — no sibling has
+vendored it yet. When one does, add the consumer to its `Downstream
+copies` cell so future broadcasts find it automatically.
 
 ## References
 

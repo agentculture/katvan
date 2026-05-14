@@ -5,6 +5,14 @@
 #                  org-site
 #   maturity     (required) one of: placeholder | experimental | usable |
 #                  deprecated
+#   docs_mode    (required) how the librarian skill treats this repo's docs:
+#                  pull           — raw-markdown docs/ dir, no own Jekyll
+#                                   site; librarian syncs it into
+#                                   site/docs/<id>/ with frontmatter injected
+#                  self-published — repo ships its own standalone Jekyll
+#                                   site; culture.dev links out, never pulls
+#                  skip           — reference/system docs or already
+#                                   migrated; librarian leaves it alone
 #   description  (required) one short sentence (<=140 chars) — what it is,
 #                  not what it will be
 #   package      (optional) PyPI package name if applicable
@@ -23,6 +31,7 @@
 - id: agentirc
   category: core-runtime
   maturity: usable
+  docs_mode: pull
   description: The IRC-native runtime for persistent AI agents and humans in shared rooms.
   package: agentirc-cli
   binary: agentirc
@@ -34,12 +43,14 @@
 - id: irc-lens
   category: core-runtime
   maturity: experimental
+  docs_mode: pull
   description: Lens CLI for inspecting AgentIRC state and message flow.
   related: [agentirc]
 
 - id: culture
   category: workspace-experience
   maturity: usable
+  docs_mode: skip
   description: The integrated workspace — CLI, harnesses, console, mesh.
   package: culture
   binary: culture
@@ -49,6 +60,7 @@
 - id: agex-cli
   category: workspace-experience
   maturity: experimental
+  docs_mode: self-published
   description: Improve an agent's developer experience; powers `culture devex`.
   docs: https://culture.dev/agex/
   related: [culture]
@@ -56,6 +68,7 @@
 - id: afi-cli
   category: workspace-experience
   maturity: usable
+  docs_mode: self-published
   description: Agent-First Interface — contracts agents publish about themselves.
   docs: https://culture.dev/afi/
   caveat: "Exposed today as `culture afi` (passthrough); planned rename to `culture contract`."
@@ -64,47 +77,56 @@
 - id: zehut
   category: identity-secrets
   maturity: experimental
+  docs_mode: pull
   description: Mesh identity — users, email, key management. ("zehut" = identity in Hebrew.)
   caveat: "`culture identity` wrapper planned, not yet shipped."
 
 - id: shushu
   category: identity-secrets
   maturity: experimental
+  docs_mode: pull
   description: Credential and secret management. ("shushu" — like "hush".)
   caveat: "`culture secret` wrapper planned, not yet shipped."
 
 - id: steward
   category: resident-culture
   maturity: experimental
+  docs_mode: skip
   description: Alignment hub for AgentCulture skills; maintains resident agents and registry hygiene.
 
 - id: ghafi
   category: resident-culture
   maturity: experimental
+  docs_mode: pull
   description: GitHub-side mechanics for the org — repo audits, PR ergonomics, registry reconciliation.
   caveat: Rename in flight.
 
 - id: auntiepypi
   category: resident-culture
   maturity: experimental
+  docs_mode: pull
   description: PyPI mechanics — maintains, uses, and serves the CLI for managing PyPI packages for the org.
 
 - id: cfafi
   category: resident-culture
   maturity: experimental
+  docs_mode: pull
   description: Cloudflare-side mechanics for the org — DNS, edge, asset delivery for culture.dev.
 
 - id: office-agent
   category: resident-domain
   maturity: experimental
+  docs_mode: skip
   description: Office sits, meeting rooms, calendar coordination — example of a domain-serving agent.
 
 - id: tipalti
   category: resident-domain
   maturity: experimental
+  docs_mode: skip
   description: Tipalti integration — example of an external-service-serving agent.
 
 - id: landing-page
   category: org-site
   maturity: experimental
+  docs_mode: skip
   description: Org-level landing page for AgentCulture.
