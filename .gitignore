@@ -222,3 +222,4 @@ site/_site/
 site/_site_culture/
 site/.jekyll-cache/
 site/vendor/
+.afi/
