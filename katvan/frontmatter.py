@@ -100,21 +100,41 @@ def parse_frontmatter_keys(fm_lines):
 
 
 def derive_title(body):
-    """First ``# H1`` in the body, leading ``# `` stripped. None if absent."""
+    """First ``# H1`` in the body, leading ``# `` stripped. None if absent.
+
+    Pure-Python, no regex (a lazy ``(.+?)\\s*$`` regex here is ReDoS-prone —
+    SonarCloud ``python:S5852``). A line is an H1 iff it starts with ``#``,
+    the character right after the ``#`` is whitespace, and there is non-empty
+    content once stripped. ``## Foo`` and ``#Foo`` therefore do not match.
+    """
     for line in body.split("\n"):
-        m = re.match(r"^#\s+(.+?)\s*$", line)
-        if m:
-            return m.group(1).strip()
+        if not line.startswith("#"):
+            continue
+        # The char right after the leading `#` must be whitespace.
+        after = line[1:2]
+        if not after or not after.isspace():
+            continue
+        title = line[1:].strip()
+        if title:
+            return title
     return None
 
 
 def derive_nav_order(rel_path):
-    """N if the filename has a numeric prefix like ``01-foo.md``, else None."""
+    """N if the filename has a numeric prefix like ``01-foo.md``, else None.
+
+    Pure-Python, no regex (``0*(\\d+)`` has overlapping character classes and
+    is ReDoS-prone — SonarCloud ``python:S5852``). Take the leading run of
+    ASCII digits from the filename; it counts only if immediately followed by
+    ``-`` or ``_``. ``int()`` handles leading zeros (``007`` -> ``7``).
+    """
     filename = rel_path.rsplit("/", 1)[-1]
-    m = re.match(r"^0*(\d+)[-_]", filename)
-    if m:
-        return int(m.group(1))
-    return None
+    i = 0
+    while i < len(filename) and filename[i] in "0123456789":
+        i += 1
+    if i == 0 or i >= len(filename) or filename[i] not in "-_":
+        return None
+    return int(filename[:i])
 
 
 def build_permalink(repo, rel_path):
