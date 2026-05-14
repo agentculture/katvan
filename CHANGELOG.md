@@ -2,23 +2,40 @@
 
 All notable changes to this project will be documented in this file.
 
-Format follows [Keep a Changelog](https://keepachangelog.com/). This
-project does not yet ship a Python package, so the versions below are
-documentation milestones rather than published artifacts; CI version
-gating arrives when/if katvan grows a packaging story.
+Format follows [Keep a Changelog](https://keepachangelog.com/). As of the
+unreleased entry below, katvan ships the `katvan` Python package; earlier
+`0.x` versions are documentation milestones rather than published
+artifacts.
 
 ## [Unreleased]
 
 ### Added
 
-- `.github/workflows/sonarcloud.yml` and `sonar-project.properties` —
-  SonarCloud scan on PR + push to main. Closes the gap where the
-  vendored `cicd` skill's `status` / `await` extensions expected a
-  Sonar scan that wasn't being produced. Scan-only (no pytest /
-  coverage) to match the current greenfield-repo posture documented in
-  `.claude/skills/cicd/SKILL.md`; the workflow gates on
-  `env.SONAR_TOKEN != ''` so a missing secret no-ops rather than
-  failing PRs.
+- The `katvan` Python CLI (PyPI package `katvan`) — scaffolded by
+  `afi-cli`, phase 2 of migrating the `librarian` skill into a real
+  installable CLI. Ships the `katvan/` package: CLI plumbing
+  (`_errors` / `_output`, argparse with structured-error routing), the
+  universal `learn` / `explain` verbs, and two ported helper modules —
+  `repos.py` (from the skill's `_repos.sh`; stdlib-only line-oriented
+  YAML parse, path-agnostic registry walk-up, `KATVAN_SIBLINGS_ROOT`
+  override) and `frontmatter.py` (from `_frontmatter.py`, near-verbatim,
+  with the core extracted into a callable `inject()` library function).
+  Packaging is `pyproject.toml` (hatchling, zero runtime deps); CI is
+  `.github/workflows/tests.yml` + `publish.yml` mirroring `afi-cli`
+  (pytest + coverage-fed SonarCloud scan; TestPyPI on PR, PyPI
+  trusted-publishing on push to main). The `librarian`
+  `_frontmatter.py` logic finally gets real unit tests. The docs verbs
+  (`overview` / `pull` / `doctor`) land in a follow-up release.
+- SonarCloud scan on PR + push to main, and `sonar-project.properties`
+  to drive it. Closes the gap where the vendored `cicd` skill's
+  `status` / `await` extensions expected a Sonar scan that wasn't being
+  produced. The scan now runs inside `.github/workflows/tests.yml`
+  (coverage-fed) — the original standalone `sonarcloud.yml` workflow
+  has been removed, and `sonar-project.properties` narrowed from
+  whole-repo to the `katvan` package with `sonar.tests`,
+  `sonar.python.version`, and `sonar.python.coverage.reportPaths` wired
+  in. The scan still gates on `env.SONAR_TOKEN != ''` so a missing
+  secret no-ops rather than failing PRs.
 - `site/` — the culture.dev Jekyll site, migrated from
   `agentculture/culture` (issue #1, Phase 0a). Behavior-preserving
   move: config, theme, data, assets, and the `docs/` content tree
