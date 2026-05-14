@@ -17,5 +17,6 @@ bundle exec jekyll serve --config _config.base.yml,_config.culture.yml
 
 CI builds the site on every PR via `.github/workflows/docs-check.yml`.
 
-Migration history and roadmap: see
-`docs/superpowers/specs/2026-05-14-culture-site-migration-design.md`.
+Migration design and implementation plan:
+`docs/superpowers/specs/2026-05-14-culture-site-migration-design.md`
+and `docs/superpowers/plans/2026-05-14-culture-site-migration.md`.
