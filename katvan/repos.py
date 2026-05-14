@@ -28,11 +28,14 @@ through this way.
 
 from __future__ import annotations
 
+import argparse
+import functools
 import os
+import sys
 from pathlib import Path
 from typing import Iterator
 
-from katvan.cli._errors import EXIT_ENV_ERROR, KatvanError
+from katvan.cli._errors import EXIT_ENV_ERROR, EXIT_USER_ERROR, KatvanError
 
 # Relative location of the registry within a katvan checkout.
 _REGISTRY_REL = Path("site/_data/agentculture_repos.yml")
@@ -53,6 +56,15 @@ def set_siblings_root(path: str | os.PathLike[str] | None) -> None:
     _siblings_root_override = Path(path) if path is not None else None
 
 
+# Memoization note: ``_find_repo_root`` and ``_parse_registry`` are wrapped
+# with ``functools.lru_cache`` — the repo root and the registry contents are
+# stable for the life of a process, and PR 2's verbs loop ``classify()`` over
+# every repo, so without caching that would be O(n^2) file reads. The
+# siblings-root (``siblings_root()`` / ``local_path()`` / ``set_siblings_root()``)
+# is deliberately NOT cached: it is intentionally mutable at runtime, and
+# nothing the caches hold depends on it, so ``set_siblings_root()`` stays
+# effective even after the registry/root have been cached.
+@functools.lru_cache(maxsize=None)
 def _find_repo_root(start: Path | None = None) -> Path:
     """Walk up from ``start`` (default CWD) to a dir containing the registry."""
     here = (start or Path.cwd()).resolve()
@@ -90,12 +102,21 @@ def siblings_root() -> Path:
     return _find_repo_root().parent
 
 
-def _parse_registry(path: Path) -> list[tuple[str, str]]:
+@functools.lru_cache(maxsize=None)
+def _parse_registry(path: Path) -> tuple[tuple[str, str], ...]:
     """Return ``(id, docs_mode)`` for every registry entry.
 
     Hand-rolled line-oriented parse — stdlib only, no PyYAML. Mirrors the
     fallback parser in ``_repos.sh``: a ``- id:`` line opens an entry, a
     following column-0 ``docs_mode:`` line sets its mode (default ``skip``).
+
+    Memoized on ``path`` — see the note above :func:`_find_repo_root`. The
+    result is a tuple (not a list) so it is hashable and safe to cache.
+
+    Raises :class:`KatvanError` if the file has non-comment content but the
+    parser still yields zero entries — a parse failure (e.g. block-style
+    YAML) that would otherwise masquerade as a legitimately empty registry.
+    A file with only comments / blank lines yields zero entries without error.
     """
     try:
         raw = path.read_text(encoding="utf-8")
@@ -107,11 +128,13 @@ def _parse_registry(path: Path) -> list[tuple[str, str]]:
         ) from err
 
     entries: list[tuple[str, str]] = []
+    has_content = False
     cur: list[str] | None = None
     for line in raw.splitlines():
         stripped = line.strip()
         if not stripped or stripped.startswith("#"):
             continue
+        has_content = True
         if stripped.startswith("- id:"):
             if cur is not None:
                 entries.append((cur[0], cur[1]))
@@ -121,7 +144,17 @@ def _parse_registry(path: Path) -> list[tuple[str, str]]:
             cur[1] = stripped.split(":", 1)[1].strip().strip("'\"")
     if cur is not None:
         entries.append((cur[0], cur[1]))
-    return entries
+
+    if not entries and has_content:
+        raise KatvanError(
+            code=EXIT_ENV_ERROR,
+            message=(
+                f"registry parsed zero entries from {path} — expected '- id:' "
+                "entries; the file may be malformed or in an unsupported YAML style"
+            ),
+            remediation="check the registry uses inline '- id: <name>' entry openers",
+        )
+    return tuple(entries)
 
 
 def local_path(repo_id: str) -> str:
@@ -166,8 +199,6 @@ def main(argv: list[str] | None = None) -> int:
     With no args, prints the ``id<TAB>docs_mode<TAB>local_path`` table — the
     same shape ``_repos.sh``'s ``librarian_repos`` emitted.
     """
-    import argparse
-
     parser = argparse.ArgumentParser(
         prog="katvan.repos",
         description="Inspect the AgentCulture sibling-repo registry.",
@@ -189,13 +220,15 @@ def main(argv: list[str] | None = None) -> int:
             print(registry_path())
             return 0
         if args.classify:
-            print(classify(args.classify))
-            return 0
+            mode = classify(args.classify)
+            print(mode)
+            # The library ``classify()`` returns the ``"unknown"`` sentinel,
+            # but the CLI shim mirrors ``_repos.sh``'s ``librarian_classify``,
+            # which exited non-zero for an unregistered repo id.
+            return EXIT_USER_ERROR if mode == "unknown" else 0
         for rid, mode, path in repos():
             print(f"{rid}\t{mode}\t{path}")
     except KatvanError as err:
-        import sys
-
         sys.stderr.write(f"error: {err.message}\n")
         if err.remediation:
             sys.stderr.write(f"hint: {err.remediation}\n")
@@ -204,6 +237,4 @@ def main(argv: list[str] | None = None) -> int:
 
 
 if __name__ == "__main__":  # pragma: no cover
-    import sys
-
     sys.exit(main())

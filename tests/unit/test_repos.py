@@ -37,19 +37,42 @@ _FIXTURE_REGISTRY = """\
 """
 
 
-@pytest.fixture()
-def fake_repo(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
-    """A temp dir laid out like a katvan checkout, with CWD pointed at a subdir."""
+def _reset_repos_caches() -> None:
+    """Clear the lru_cache on _find_repo_root / _parse_registry.
+
+    Both are memoized for process lifetime; tests deliberately point them at
+    different temp checkouts, so the caches must be cleared between tests.
+    """
+    repos_mod._find_repo_root.cache_clear()
+    repos_mod._parse_registry.cache_clear()
+
+
+@pytest.fixture(autouse=True)
+def _clear_caches() -> None:
+    """Reset the memoization caches around every test (autouse)."""
+    _reset_repos_caches()
+    yield
+    _reset_repos_caches()
+
+
+def _write_checkout(tmp_path: Path, registry_text: str, monkeypatch: pytest.MonkeyPatch) -> Path:
+    """Lay out a temp dir like a katvan checkout and chdir into a nested subdir."""
     registry = tmp_path / "site" / "_data" / "agentculture_repos.yml"
     registry.parent.mkdir(parents=True)
-    registry.write_text(_FIXTURE_REGISTRY, encoding="utf-8")
-    # Walk-up should find the registry even from a nested dir.
+    registry.write_text(registry_text, encoding="utf-8")
     nested = tmp_path / "docs" / "deep"
     nested.mkdir(parents=True)
     monkeypatch.chdir(nested)
     monkeypatch.delenv("KATVAN_SIBLINGS_ROOT", raising=False)
     repos_mod.set_siblings_root(None)
-    yield tmp_path
+    return tmp_path
+
+
+@pytest.fixture()
+def fake_repo(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
+    """A temp dir laid out like a katvan checkout, with CWD pointed at a subdir."""
+    root = _write_checkout(tmp_path, _FIXTURE_REGISTRY, monkeypatch)
+    yield root
     repos_mod.set_siblings_root(None)
 
 
@@ -152,6 +175,60 @@ def test_main_surfaces_env_error(
     err = capsys.readouterr().err
     assert "error:" in err
     assert "hint:" in err
+
+
+def test_comment_only_registry_yields_zero_entries_without_erroring(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A registry with only comments / blank lines is legitimately empty."""
+    _write_checkout(tmp_path, "# just a comment\n\n#   another\n\n", monkeypatch)
+    assert list(repos_mod.repos()) == []
+    assert repos_mod.classify("anything") == "unknown"
+
+
+def test_quoted_ids_are_unquoted(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """``- id: "foo"`` / ``- id: 'bar'`` strip to ``foo`` / ``bar``."""
+    registry = (
+        '- id: "foo"\n'
+        "  docs_mode: pull\n"
+        "- id: 'bar'\n"
+        "  docs_mode: skip\n"
+    )
+    _write_checkout(tmp_path, registry, monkeypatch)
+    rows = list(repos_mod.repos())
+    assert [r[0] for r in rows] == ["foo", "bar"]
+    assert repos_mod.classify("foo") == "pull"
+    assert repos_mod.classify("bar") == "skip"
+
+
+def test_trailing_whitespace_on_docs_mode_is_parsed(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """``docs_mode:`` lines with trailing whitespace still parse correctly."""
+    registry = "- id: spaced\n  docs_mode: pull   \n"
+    _write_checkout(tmp_path, registry, monkeypatch)
+    assert repos_mod.classify("spaced") == "pull"
+
+
+def test_malformed_block_style_registry_raises(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A non-empty registry with no inline ``- id:`` openers raises KatvanError."""
+    registry = "-\n  id: blockstyle\n  docs_mode: pull\n"
+    _write_checkout(tmp_path, registry, monkeypatch)
+    with pytest.raises(KatvanError) as exc:
+        list(repos_mod.repos())
+    assert exc.value.code == 2  # EXIT_ENV_ERROR
+    assert "zero entries" in exc.value.message
+
+
+def test_main_classify_unknown_exits_nonzero(
+    fake_repo: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """The CLI shim exits non-zero for an unknown id (matching _repos.sh)."""
+    rc = repos_mod.main(["--classify", "does-not-exist"])
+    assert rc == 1  # EXIT_USER_ERROR
+    assert capsys.readouterr().out.strip() == "unknown"
 
 
 def test_real_registry_is_parseable() -> None:
