@@ -25,6 +25,15 @@ gating arrives when/if katvan grows a packaging story.
   copied verbatim; `docs/superpowers/` and `docs/resources/` left in
   culture (excluded from the build there, not migrated). Built green
   by the new `docs-check` workflow.
+- `site/sitemap.html`, `site/sitemap-main.html`,
+  `site/sitemap-agentirc.html`, `site/robots.txt`, `site/favicon.ico` —
+  site-infrastructure files that publish `/sitemap.xml`,
+  `/sitemap-main.xml`, `/agentirc/sitemap.xml`, `/robots.txt`, and
+  `/favicon.ico`. Missed by the PR 2 inventory (whose parity check only
+  diffed `*.html` outputs); a full-output diff against culture's build
+  caught the gap. culture-repo cruft that also leaks into culture's
+  build (`CHANGELOG.md`, `SECURITY.md`, `coverage.xml`,
+  `sonar-project.properties`, `dist/*`) is intentionally not migrated.
 
 ## [0.1.0] - 2026-05-12
 
