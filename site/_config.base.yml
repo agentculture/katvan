@@ -1,0 +1,33 @@
+title: ""
+description: ""
+baseurl: ""
+url: ""
+lang: en
+
+theme: just-the-docs
+color_scheme: dark-terminal
+
+search_enabled: true
+search:
+  button: true
+
+plugins:
+  - jekyll-seo-tag
+  - jekyll-relative-links
+  - jekyll-redirect-from
+
+relative_links:
+  enabled: true
+  collections: false
+
+defaults:
+  - scope:
+      path: ""
+    values:
+      layout: "default"
+
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - _site/
+  - _site_culture/

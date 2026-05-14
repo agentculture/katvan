@@ -165,7 +165,7 @@ venv.bak/
 .ropeproject
 
 # mkdocs documentation
-/site
+# /site — removed: site/ is now the Jekyll source tree (not a build artifact)
 
 # mypy
 .mypy_cache/
@@ -216,3 +216,9 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Jekyll (site/)
+site/_site/
+site/_site_culture/
+site/.jekyll-cache/
+site/vendor/
