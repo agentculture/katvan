@@ -19,6 +19,12 @@ gating arrives when/if katvan grows a packaging story.
   `.claude/skills/cicd/SKILL.md`; the workflow gates on
   `env.SONAR_TOKEN != ''` so a missing secret no-ops rather than
   failing PRs.
+- `site/` — the culture.dev Jekyll site, migrated from
+  `agentculture/culture` (issue #1, Phase 0a). Behavior-preserving
+  move: config, theme, data, assets, and the `docs/` content tree
+  copied verbatim; `docs/superpowers/` and `docs/resources/` left in
+  culture (excluded from the build there, not migrated). Built green
+  by the new `docs-check` workflow.
 
 ## [0.1.0] - 2026-05-12
 
