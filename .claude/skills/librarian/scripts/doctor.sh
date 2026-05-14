@@ -79,6 +79,45 @@ add_finding() {
     printf '%s\t%s\t%s\t%s\t%s\n' "$1" "$2" "$3" "$4" "$5" >> "$FINDINGS_FILE"
 }
 
+# Resolve a relative markdown link target the way Jekyll/just-the-docs
+# would, not as a literal on-disk path. A bare `[..](page/)` or
+# `[..](page.html)` link is valid if a `page/index.md` or `page.md`
+# source exists — flagging those as broken auto-files false-positive
+# issues on sibling repos. Returns 0 if ANY plausible source mapping
+# exists on disk, 1 otherwise.
+#   $1 = directory the link is relative to
+#   $2 = cleaned target (no #anchor, no ?query, not external)
+link_target_resolves() {
+    local reldir="$1" clean="$2"
+    # 1. Literal target — direct .md links and assets (images etc.).
+    [[ -e "$reldir/$clean" ]] && return 0
+    case "$clean" in
+        */)
+            # Pretty-URL directory link: <target>index.md or
+            # <target without trailing slash>.md.
+            local base="${clean%/}"
+            [[ -e "$reldir/$clean"index.md ]] && return 0
+            [[ -e "$reldir/$base.md" ]] && return 0
+            ;;
+        *.html)
+            # .html target: the same path as .md, or <base>/index.md.
+            local stem="${clean%.html}"
+            [[ -e "$reldir/$stem.md" ]] && return 0
+            [[ -e "$reldir/$stem/index.md" ]] && return 0
+            ;;
+        *.*)
+            # Has some other extension (asset, .json, etc.) — only the
+            # literal test above applies; nothing more to try.
+            ;;
+        *)
+            # Extensionless target: <target>.md or <target>/index.md.
+            [[ -e "$reldir/$clean.md" ]] && return 0
+            [[ -e "$reldir/$clean/index.md" ]] && return 0
+            ;;
+    esac
+    return 1
+}
+
 # Latest sibling commit sha touching docs/.
 sibling_docs_sha() {
     local id="$1" local_path="$2" sha=""
@@ -151,13 +190,17 @@ check_repo() {
         while IFS= read -r target; do
             [[ -z "$target" ]] && continue
             case "$target" in
-                http://*|https://*|mailto:*|//*|/*) continue ;;
+                http://*|https://*|mailto:*|tel:*|//*|/*) continue ;;
                 \#*) continue ;;
             esac
-            # Strip any #anchor and ?query.
+            # Strip any #anchor and ?query before resolving.
             clean="${target%%#*}"; clean="${clean%%\?*}"
             [[ -z "$clean" ]] && continue
-            if [[ ! -e "$reldir/$clean" ]]; then
+            # Resolve the way Jekyll would: a finding is only recorded
+            # when NONE of the plausible source mappings exist (literal
+            # target, pretty-URL dir -> index.md/.md, .html -> .md,
+            # extensionless -> .md/index.md).
+            if ! link_target_resolves "$reldir" "$clean"; then
                 rel="${f#"$dest"/}"
                 add_finding "$id" "broken-internal-link" "sibling" "error" \
                     "$rel -> $target (target missing)"

@@ -152,12 +152,68 @@ else
     [[ -n "$API_REF" ]] && COMMITS_ARGS+=(-f "sha=$API_REF")
     RESOLVED_REF="$(gh "${COMMITS_ARGS[@]}" --jq '.[0].sha' 2>/dev/null || true)"
     [[ -z "$RESOLVED_REF" ]] && RESOLVED_REF="${API_REF:-HEAD}"
+    # Fetch one contents-API directory listing, distinguishing the three
+    # outcomes that an `|| true` would otherwise flatten into one:
+    #   * success            -> echo the JSON, return 0
+    #   * genuine 404        -> return 1 (caller decides: top-level 404 is
+    #                           a user error "repo has no docs/"; a
+    #                           sub-dir 404 is treated as empty)
+    #   * any other failure  -> return 2 (auth, rate-limit, network,
+    #                           malformed/invalid-JSON response) — an
+    #                           environment error, never "nothing here"
+    # An empty body or one that doesn't parse as JSON is also a (2).
+    fetch_listing() {
+        local subpath="$1"
+        local out err status
+        err="$(mktemp)"
+        out="$(gh api "repos/agentculture/$REPO/contents/${subpath}${REF_QS}" 2>"$err")"
+        status=$?
+        if [[ "$status" -ne 0 ]]; then
+            local errtext
+            errtext="$(cat "$err")"
+            rm -f "$err"
+            if printf '%s' "$errtext" | grep -qiE 'not found|HTTP 404'; then
+                return 1
+            fi
+            echo "✗ gh api failed listing ${subpath} in $REPO (exit $status):" >&2
+            printf '  %s\n' "$errtext" >&2
+            return 2
+        fi
+        rm -f "$err"
+        # A 0 exit with an empty or non-JSON body is still a broken
+        # response — treat it as an environment error, not "empty dir".
+        if [[ -z "$out" ]] || ! printf '%s' "$out" \
+                | python3 -c 'import json,sys; json.load(sys.stdin)' 2>/dev/null; then
+            echo "✗ gh api returned an empty or invalid-JSON listing for ${subpath} in $REPO." >&2
+            return 2
+        fi
+        printf '%s' "$out"
+        return 0
+    }
+
     # Recursively walk docs/ via the contents API.
     remote_walk() {
         local subpath="$1"
-        local listing
-        listing="$(gh api "repos/agentculture/$REPO/contents/${subpath}${REF_QS}" 2>/dev/null || true)"
-        [[ -z "$listing" ]] && return 0
+        local listing fl_status
+        listing="$(fetch_listing "$subpath")"
+        fl_status=$?
+        if [[ "$fl_status" -eq 1 ]]; then
+            # 404. For the top-level docs/ this is a legitimate "this
+            # repo has no docs/ directory" — a user error (exit 1).
+            # For a subdirectory it just means nothing more to walk.
+            if [[ "$subpath" == "docs" ]]; then
+                echo "✗ $REPO has no docs/ directory (gh api: Not Found)." >&2
+                echo "  Nothing to pull." >&2
+                exit 1
+            fi
+            return 0
+        elif [[ "$fl_status" -ne 0 ]]; then
+            # Environment error (auth / rate-limit / network / bad JSON).
+            # fetch_listing already printed the cause. Never silently
+            # treat this as "empty" — abort the whole pull with exit 2.
+            echo "  Aborting pull — this is an environment error, not 'no docs'." >&2
+            exit 2
+        fi
         # Each entry: type + path + download_url.
         while IFS=$'\t' read -r etype epath edl; do
             [[ -z "$etype" ]] && continue
