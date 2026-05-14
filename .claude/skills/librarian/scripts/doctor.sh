@@ -141,7 +141,13 @@ check_repo() {
     while IFS= read -r -d '' f; do
         reldir="$(dirname "$f")"
         # Extract markdown link targets; keep only relative, non-anchor,
-        # non-URL ones.
+        # non-URL ones. Links inside ```-fenced code blocks are skipped:
+        # they're documentation examples, not real links, and a false
+        # positive here gets auto-filed as an issue on a sibling repo.
+        # awk tracks a simple in-fence toggle as it scans lines, only
+        # emitting link targets from lines OUTSIDE a fence. (Residual
+        # edge: an inline `code span` containing `](...)` on a non-fenced
+        # line can still match — see SKILL.md known-limitation note.)
         while IFS= read -r target; do
             [[ -z "$target" ]] && continue
             case "$target" in
@@ -156,8 +162,18 @@ check_repo() {
                 add_finding "$id" "broken-internal-link" "sibling" "error" \
                     "$rel -> $target (target missing)"
             fi
-        done < <(grep -oE '\]\([^)]+\)' "$f" 2>/dev/null \
-                   | sed -E 's/^\]\(//; s/\)$//' )
+        done < <(awk '
+            /^[[:space:]]*```/ { infence = !infence; next }
+            !infence {
+                line = $0
+                while (match(line, /\]\([^)]+\)/)) {
+                    tok = substr(line, RSTART, RLENGTH)
+                    sub(/^\]\(/, "", tok); sub(/\)$/, "", tok)
+                    print tok
+                    line = substr(line, RSTART + RLENGTH)
+                }
+            }
+        ' "$f" 2>/dev/null)
     done < <(find "$dest" -name '*.md' -type f -print0 2>/dev/null)
 
     # ---- katvan-actionable checks ----
@@ -228,6 +244,18 @@ file_issues() {
     pairs="$(awk -F'\t' '$3=="sibling"{print $1"\t"$2}' "$FINDINGS_FILE" | sort -u)"
     [[ -z "$pairs" ]] && return 0
 
+    # Preflight: a real (non-dry-run) issue-filing pass needs gh
+    # authenticated. Without this, the dedup search below silently
+    # no-ops (gh errors are swallowed), every issue looks "new", and
+    # then post-issue.sh fails per-issue with a confusing error. Fail
+    # fast and clearly instead.
+    if [[ "$DRY_RUN" -eq 0 ]]; then
+        if ! command -v gh >/dev/null 2>&1 || ! gh auth status >/dev/null 2>&1; then
+            echo "error: gh not authenticated — run 'gh auth login'" >&2
+            exit 2
+        fi
+    fi
+
     while IFS=$'\t' read -r repo check; do
         [[ -z "$repo" ]] && continue
         local marker="<!-- katvan-doctor: $repo/$check -->"
@@ -259,6 +287,12 @@ file_issues() {
         } > "$body_file"
 
         # Search for an existing open issue carrying the marker.
+        # NOTE: GitHub's issue search index is eventually consistent — a
+        # freshly-filed issue can take seconds to become searchable. Two
+        # `doctor` runs within that window can both miss the same issue
+        # and double-file. This is a known, low-probability race; the
+        # marker still makes later runs converge (they'll find one of the
+        # duplicates once the index catches up).
         local existing_num=""
         if command -v gh >/dev/null 2>&1; then
             existing_num="$(gh issue list --repo "agentculture/$repo" \

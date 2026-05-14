@@ -91,6 +91,10 @@ trap cleanup EXIT
 
 SOURCE_KIND=""
 RESOLVED_REF=""
+# Count of source files that failed to stage (git show / curl / gh api).
+# Any non-zero value makes the pull "partial": the manifest is stamped,
+# a loud warning prints, and the script exits non-zero.
+STAGE_FAILURES=0
 
 if [[ -n "$LOCAL_PATH" && -d "$LOCAL_PATH/.git" ]]; then
     SOURCE_KIND="local"
@@ -109,8 +113,11 @@ if [[ -n "$LOCAL_PATH" && -d "$LOCAL_PATH/.git" ]]; then
             [[ -z "$path" ]] && continue
             rel="${path#docs/}"
             mkdir -p "$STAGE/$(dirname "$rel")"
-            git -C "$LOCAL_PATH" show "$RESOLVED_REF:$path" > "$STAGE/$rel" 2>/dev/null \
-                || echo "  warn: could not extract $path@$REF" >&2
+            if ! git -C "$LOCAL_PATH" show "$RESOLVED_REF:$path" > "$STAGE/$rel" 2>/dev/null; then
+                echo "  warn: could not extract $path@$REF" >&2
+                rm -f "$STAGE/$rel"
+                STAGE_FAILURES=$((STAGE_FAILURES + 1))
+            fi
         done < <(git -C "$LOCAL_PATH" ls-tree -r --name-only "$RESOLVED_REF" -- docs/ 2>/dev/null)
     else
         RESOLVED_REF="$(git -C "$LOCAL_PATH" rev-parse HEAD 2>/dev/null || echo "working-tree")"
@@ -160,12 +167,18 @@ else
                 rel="${epath#docs/}"
                 mkdir -p "$STAGE/$(dirname "$rel")"
                 if [[ -n "$edl" && "$edl" != "null" ]]; then
-                    curl -fsSL "$edl" -o "$STAGE/$rel" 2>/dev/null \
-                        || echo "  warn: could not download $epath" >&2
+                    if ! curl -fsSL "$edl" -o "$STAGE/$rel" 2>/dev/null; then
+                        echo "  warn: could not download $epath" >&2
+                        rm -f "$STAGE/$rel"
+                        STAGE_FAILURES=$((STAGE_FAILURES + 1))
+                    fi
                 else
-                    gh api "repos/agentculture/$REPO/contents/${epath}${REF_QS}" \
-                        --jq '.content' 2>/dev/null | base64 -d > "$STAGE/$rel" \
-                        || echo "  warn: could not fetch $epath" >&2
+                    if ! gh api "repos/agentculture/$REPO/contents/${epath}${REF_QS}" \
+                            --jq '.content' 2>/dev/null | base64 -d > "$STAGE/$rel"; then
+                        echo "  warn: could not fetch $epath" >&2
+                        rm -f "$STAGE/$rel"
+                        STAGE_FAILURES=$((STAGE_FAILURES + 1))
+                    fi
                 fi
             fi
         done < <(printf '%s' "$listing" \
@@ -187,6 +200,14 @@ fi
 mapfile -t SRC_FILES < <(cd "$STAGE" && find . -type f -print 2>/dev/null | sed 's|^\./||' | sort)
 
 if [[ ${#SRC_FILES[@]} -eq 0 ]]; then
+    # No files staged. If that's because every source file failed to
+    # stage (vs. the source genuinely having no docs), it's a partial /
+    # failed pull — exit 2 (env/transient), not 1 (user error).
+    if [[ "$STAGE_FAILURES" -gt 0 ]]; then
+        echo "✗ pull FAILED — all $STAGE_FAILURES source file(s) failed to stage." >&2
+        echo "  Nothing was written. Re-run once the source is reachable." >&2
+        exit 2
+    fi
     echo "✗ no files found under $REPO's docs/ (ref: ${REF:-default}). Nothing to pull." >&2
     exit 1
 fi
@@ -299,9 +320,9 @@ done
 MANIFEST="$DEST/.katvan-pull.json"
 ENTRIES_FILE="$(mktemp)"
 printf '%s\n' "${MANIFEST_ENTRIES[@]}" > "$ENTRIES_FILE"
-python3 - "$REPO" "${REF:-default}" "$RESOLVED_REF" "$MANIFEST" "$ENTRIES_FILE" <<'PY'
+python3 - "$REPO" "${REF:-default}" "$RESOLVED_REF" "$MANIFEST" "$ENTRIES_FILE" "$STAGE_FAILURES" <<'PY'
 import json, sys, datetime
-repo, ref, sha, manifest_path, entries_path = sys.argv[1:6]
+repo, ref, sha, manifest_path, entries_path, stage_failures = sys.argv[1:7]
 files = []
 with open(entries_path, encoding="utf-8") as fh:
     for line in fh:
@@ -316,6 +337,10 @@ doc = {
     "ref": ref,
     "sha": sha,
     "pulled_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+    # A partial pull (one or more source files failed to stage) is an
+    # incomplete sync — flag it so downstream tooling and humans don't
+    # mistake it for a clean snapshot. False on a clean pull.
+    "partial": int(stage_failures) > 0,
     "files": files,
 }
 with open(manifest_path, "w", encoding="utf-8") as fh:
@@ -337,6 +362,17 @@ else
     echo
     echo "Changes are in the working tree — pull.sh never commits."
     echo "Hand off to the cicd skill to open the PR."
+fi
+
+# A partial pull is a silently-incomplete sync if we let it exit 0 — so
+# warn loudly and exit 2 (environment/transient error). The manifest
+# already carries "partial": true.
+if [[ "$STAGE_FAILURES" -gt 0 ]]; then
+    echo >&2
+    echo "WARNING: pull was PARTIAL — $STAGE_FAILURES file(s) failed to stage." >&2
+    echo "  The manifest is stamped \"partial\": true. Re-run the pull once the" >&2
+    echo "  source is reachable; do not treat this sync as complete." >&2
+    exit 2
 fi
 
 exit 0

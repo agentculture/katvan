@@ -34,7 +34,7 @@ import sys
 _KEY_ORDER = ["title", "sites", "permalink", "nav_order"]
 
 
-def split_frontmatter(text):
+def split_frontmatter(text, rel_path=None):
     """Return (frontmatter_lines, body).
 
     frontmatter_lines is the list of raw lines between the `---` fences
@@ -51,11 +51,25 @@ def split_frontmatter(text):
     for idx in range(1, len(lines)):
         if lines[idx].strip() == "---":
             fm_lines = lines[1:idx]
-            # Body is everything after the closing fence. Rejoin with \n;
-            # the opening `---` consumed exactly one leading newline.
-            body = "\n".join(lines[idx + 1:])
+            # Body is everything after the closing fence. Slice it out of
+            # the original `text` by string offset rather than rejoining
+            # the split lines — rejoining would normalize CRLF to LF and
+            # break the "byte-for-byte" guarantee. `lines[:idx+1]` is the
+            # opening fence + frontmatter + closing fence; it was produced
+            # by splitting on "\n", so re-joining on "\n" and adding back
+            # the one trailing "\n" reconstructs the exact prefix length.
+            prefix = "\n".join(lines[:idx + 1]) + "\n"
+            body = text[len(prefix):]
             return fm_lines, body
-    # No closing fence — treat the whole thing as body (malformed block).
+    # Opener with no closing fence — malformed. Warn loudly to stderr so
+    # the operator sees it (otherwise the malformed text would silently be
+    # treated as body and then re-wrapped in a fresh block, duplicating
+    # it), and treat the whole input as body.
+    where = rel_path if rel_path else "<stdin>"
+    sys.stderr.write(
+        "_frontmatter.py: warning: {}: frontmatter opener with no closing "
+        "fence — treating whole file as body\n".format(where)
+    )
     return [], text
 
 
@@ -133,7 +147,7 @@ def main(argv=None):
     args = parser.parse_args(argv)
 
     text = sys.stdin.read()
-    fm_lines, body = split_frontmatter(text)
+    fm_lines, body = split_frontmatter(text, args.rel_path)
     existing_keys = parse_frontmatter_keys(fm_lines)
 
     # Compute the defaults we would inject.

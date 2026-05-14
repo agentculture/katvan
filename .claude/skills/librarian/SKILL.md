@@ -139,6 +139,12 @@ one issue body, via the `communicate` skill's `post-issue.sh` /
 **katvan-actionable** — the fix belongs in katvan. `doctor` prints these
 locally and **never files an issue** for them.
 
+> **Known limitation:** `broken-internal-link` skips links inside
+> ` ``` `-fenced code blocks (they're examples, not real links), but a
+> `](...)` sequence inside an *inline* `code span` on a non-fenced line
+> can still match — rare in practice, and a false positive only adds a
+> stale issue, never breaks the sync.
+
 ### The dedup-marker convention
 
 Every doctor-filed issue body embeds an HTML-comment marker:
