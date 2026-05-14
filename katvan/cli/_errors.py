@@ -17,10 +17,12 @@ from dataclasses import dataclass
 # 0      = success
 # 1      = user-input error (bad flag, missing required arg, unknown path)
 # 2      = environment / setup error (tool not installed, file unreadable)
-# 3+     = reserved for future categorisation
+# 3      = internal/unexpected error (a bug in katvan)
+# 4+     = reserved for future categorisation
 EXIT_SUCCESS = 0
 EXIT_USER_ERROR = 1
 EXIT_ENV_ERROR = 2
+EXIT_INTERNAL_ERROR = 3
 
 
 @dataclass

@@ -52,6 +52,28 @@ def test_unknown_verb_exits_nonzero_with_hint(
     assert "hint:" in err
 
 
+def test_internal_crash_exits_three_with_bug_hint(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    """A handler raising a plain (non-KatvanError) exception exits 3, not 1.
+
+    Exit 1 is the user-input code; an internal crash is a bug in katvan and
+    must be distinguishable for scripts/agents (see _errors.EXIT_INTERNAL_ERROR).
+    """
+    import argparse
+
+    from katvan.cli import _dispatch
+
+    def _boom(_args: argparse.Namespace) -> int:
+        raise RuntimeError("boom")
+
+    ns = argparse.Namespace(func=_boom, json=False)
+    rc = _dispatch(ns)
+    assert rc == 3
+    err = capsys.readouterr().err
+    assert "file a bug" in err
+
+
 def test_python_dash_m_invocation() -> None:
     """`python -m katvan --version` exits 0 and prints the version."""
     result = subprocess.run(

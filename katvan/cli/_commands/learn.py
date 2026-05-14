@@ -54,7 +54,8 @@ Exit-code policy
   0 success
   1 user-input error (bad flag, bad path, missing arg)
   2 environment / setup error (registry not found, unreadable file)
-  3+ reserved
+  3 internal/unexpected error (a bug in katvan)
+  4+ reserved
 
 More detail
 -----------
@@ -84,6 +85,7 @@ def _as_json_payload() -> dict[str, object]:
             "0": "success",
             "1": "user-input error",
             "2": "environment/setup error",
+            "3": "internal/unexpected error (bug)",
         },
         "json_support": True,
         "explain_pointer": "katvan explain <path> (e.g. 'katvan explain learn')",

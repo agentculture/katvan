@@ -28,7 +28,7 @@ import sys
 from katvan import __version__
 from katvan.cli._commands import explain as _explain_cmd
 from katvan.cli._commands import learn as _learn_cmd
-from katvan.cli._errors import EXIT_USER_ERROR, KatvanError
+from katvan.cli._errors import EXIT_INTERNAL_ERROR, EXIT_USER_ERROR, KatvanError
 from katvan.cli._output import emit_error
 
 
@@ -105,7 +105,7 @@ def _dispatch(args: argparse.Namespace) -> int:
         return err.code
     except Exception as err:  # noqa: BLE001 - last-resort; wrap and route cleanly
         wrapped = KatvanError(
-            code=EXIT_USER_ERROR,
+            code=EXIT_INTERNAL_ERROR,
             message=f"unexpected: {err.__class__.__name__}: {err}",
             remediation="file a bug at https://github.com/agentculture/katvan/issues",
         )
