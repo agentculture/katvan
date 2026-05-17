@@ -8,14 +8,18 @@ byte-for-byte body guarantee (incl. CRLF), and the malformed-opener warning.
 
 from __future__ import annotations
 
+import io
 import subprocess
 import sys
+
+import pytest
 
 from katvan.frontmatter import (
     build_permalink,
     derive_nav_order,
     derive_title,
     inject,
+    main,
     parse_frontmatter_keys,
     render_value,
     split_frontmatter,
@@ -158,6 +162,38 @@ def test_module_cli_roundtrips_via_stdin() -> None:
     assert result.stdout.startswith("---\n")
     assert "title: Hi" in result.stdout
     assert result.stdout.endswith("\n# Hi\n\nbody\n")
+
+
+# --- in-process main() tests (no subprocess, so pytest-cov instruments) ---
+
+
+def test_main_function_roundtrips_stdin_to_stdout(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    monkeypatch.setattr("sys.stdin", io.StringIO("# Hi\n\nbody\n"))
+    rc = main(["--repo", "ghafi", "--rel-path", "x.md"])
+    assert rc == 0
+    captured = capsys.readouterr()
+    assert captured.out.startswith("---\n")
+    assert "title: Hi" in captured.out
+    assert captured.out.endswith("\n# Hi\n\nbody\n")
+    assert captured.err == ""
+
+
+def test_main_function_warns_to_stderr_on_malformed_opener(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    monkeypatch.setattr("sys.stdin", io.StringIO("---\ntitle: no close\n\nbody\n"))
+    rc = main(["--repo", "ghafi", "--rel-path", "bad.md"])
+    assert rc == 0
+    captured = capsys.readouterr()
+    assert "no closing fence" in captured.err
+    assert "bad.md" in captured.err
+
+
+def test_main_function_requires_repo_argument() -> None:
+    with pytest.raises(SystemExit):
+        main(["--rel-path", "x.md"])
 
 
 def test_module_cli_warns_on_malformed_opener_to_stderr() -> None:
