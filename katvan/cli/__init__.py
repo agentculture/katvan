@@ -26,6 +26,7 @@ import argparse
 import sys
 
 from katvan import __version__
+from katvan.cli._commands import doctor as _doctor_cmd
 from katvan.cli._commands import explain as _explain_cmd
 from katvan.cli._commands import learn as _learn_cmd
 from katvan.cli._commands import overview as _overview_cmd
@@ -87,8 +88,7 @@ def _build_parser() -> argparse.ArgumentParser:
     _explain_cmd.register(sub)
     _overview_cmd.register(sub)
     _pull_cmd.register(sub)
-    # The remaining docs verb — doctor — registers here in a later release
-    # once it is ported from the librarian skill.
+    _doctor_cmd.register(sub)
 
     return parser
 
