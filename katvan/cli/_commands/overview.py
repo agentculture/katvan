@@ -31,7 +31,13 @@ def register(sub: argparse._SubParsersAction) -> None:
     parser.set_defaults(func=_handle)
 
 
-def _handle(args: argparse.Namespace) -> int:
+def _handle(args: argparse.Namespace) -> None:
+    """Print the registry overview.
+
+    No failure path — registry-parse errors raise :class:`KatvanError` upstream
+    in ``repos.entries()``. The dispatcher in :mod:`katvan.cli` translates a
+    ``None`` return into exit code 0.
+    """
     grouped: dict[str, list[dict[str, Any]]] = defaultdict(list)
     for entry in repos.entries():
         grouped[entry["category"]].append(entry)
@@ -39,7 +45,7 @@ def _handle(args: argparse.Namespace) -> int:
 
     if args.json:
         emit_result({"total": total, "by_category": dict(grouped)}, json_mode=True)
-        return 0
+        return
 
     print(f"AgentCulture registry — {total} repos")
     print()
@@ -51,4 +57,3 @@ def _handle(args: argparse.Namespace) -> int:
         for entry in items:
             print(f"  - {entry['id']}: {entry['description']}")
         print()
-    return 0

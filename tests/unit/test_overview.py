@@ -79,8 +79,7 @@ def test_handle_json_groups_all_six_known_categories(
     fake_repo: Path, capsys: pytest.CaptureFixture[str]
 ) -> None:
     """JSON mode surfaces every known category bucket from the fixture."""
-    rc = overview_mod._handle(argparse.Namespace(json=True))
-    assert rc == 0
+    overview_mod._handle(argparse.Namespace(json=True))
     by_cat = json.loads(capsys.readouterr().out)["by_category"]
     assert set(by_cat) >= {
         "workspace-experience",
@@ -102,8 +101,7 @@ def test_handle_json_keeps_unknown_categories(
     This exercises the defaultdict semantics in ``_handle`` — the overview
     text mode then silently drops the unknown bucket (no `KeyError`).
     """
-    rc = overview_mod._handle(argparse.Namespace(json=True))
-    assert rc == 0
+    overview_mod._handle(argparse.Namespace(json=True))
     by_cat = json.loads(capsys.readouterr().out)["by_category"]
     assert "experimental-future-thing" in by_cat
     assert by_cat["experimental-future-thing"][0]["id"] == "oddball"
@@ -116,8 +114,7 @@ def test_handle_text_prints_total_and_known_headers(
     fake_repo: Path, capsys: pytest.CaptureFixture[str]
 ) -> None:
     args = argparse.Namespace(json=False)
-    rc = overview_mod._handle(args)
-    assert rc == 0
+    overview_mod._handle(args)
     out = capsys.readouterr().out
     # Total counts every entry (including the oddball).
     assert "AgentCulture registry — 7 repos" in out
@@ -148,8 +145,7 @@ def test_handle_text_skips_categories_with_no_entries(
     monkeypatch.delenv("KATVAN_SIBLINGS_ROOT", raising=False)
     repos_mod.set_siblings_root(None)
 
-    rc = overview_mod._handle(argparse.Namespace(json=False))
-    assert rc == 0
+    overview_mod._handle(argparse.Namespace(json=False))
     out = capsys.readouterr().out
     assert "Core Runtime" in out
     assert "Workspace Experience" not in out
@@ -163,8 +159,7 @@ def test_handle_json_emits_total_and_by_category(
     fake_repo: Path, capsys: pytest.CaptureFixture[str]
 ) -> None:
     args = argparse.Namespace(json=True)
-    rc = overview_mod._handle(args)
-    assert rc == 0
+    overview_mod._handle(args)
     payload = json.loads(capsys.readouterr().out)
     assert payload["total"] == 7
     assert "by_category" in payload
