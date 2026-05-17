@@ -9,6 +9,54 @@ artifacts.
 
 ## [Unreleased]
 
+## [0.2.0] — 2026-05-18
+
+### Added
+
+- Three new verbs implementing the culture.dev marketing rebuild: `overview`
+  (per-category registry summary), `pull` (AFI-only reference sync —
+  invokes each `pull-reference` sibling's binary with `learn --json` +
+  `explain --json` and writes deterministic markdown into
+  `site/docs/<id>/reference/`), and `doctor` (CI gate for culture.dev IA
+  health — every registered repo must have a hand-authored `index.md` and,
+  for `pull-reference` repos, a synced reference tree).
+- `repos.entries()` helper that returns full registry rows as dicts
+  (existing `repos()` only yielded `(id, mode, local_path)`).
+- `site/_data/style.yml` — voice and naming pin for all hand-authored
+  culture.dev copy.
+- `site/_data/landing.yml` — hero, three capability pills, and why-band
+  copy consumed by the new `home` layout.
+- Marketing-shaped `site/_layouts/home.html` (4 bands) + landing-band SCSS
+  in `site/_sass/custom/custom.scss`.
+- `site/docs/quickstart.md`, `site/docs/why.md` (manifesto), and
+  `site/docs/ecosystem.md` plus 6 category overview pages under
+  `site/docs/categories/`.
+- 21 per-repo `site/docs/<id>/index.md` pages, one for every registered
+  repo.
+- `.github/workflows/reference-sync.yml` — bot-PR workflow (nightly cron +
+  `workflow_dispatch`) that pulls and opens a PR when reference content
+  changes.
+- `site/_includes/analytics.html` — Plausible include (no-op until
+  `analytics_host` / `analytics_domain` are uncommented in
+  `_config.culture.yml`).
+
+### Changed
+
+- `site/_data/agentculture_repos.yml` trued up to 21 repos. `docs_mode`
+  collapsed to `pull-reference` / `skip`; `self-published` removed.
+- `.github/workflows/docs-check.yml` extended: installs katvan, runs
+  `katvan pull --all` (tolerant of missing sibling binaries), then
+  `katvan doctor` as a hard gate before the Jekyll build.
+
+### Removed
+
+- 67 pre-rebuild files under `site/docs/` superseded by the new IA
+  (per-repo `index.md` pages, category overviews, and the manifesto).
+  Six files were kept and reorganised under `/architecture/` as
+  contributor-facing reference.
+
+## [0.1.0] — earlier
+
 ### Added
 
 - The `katvan` Python CLI (PyPI package `katvan`) — scaffolded by

@@ -10,11 +10,23 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-    defaults:
-      run:
-        working-directory: site
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
+      - uses: astral-sh/setup-uv@38f3f104447c67c051c4a08e39b64a148898af3a # v4
+
+      - name: Install katvan from this checkout
+        run: uv tool install .
+
+      - name: Pull reference for all pull-reference siblings
+        run: katvan pull --all
+        # Siblings are NOT checked out in CI; pull will fail silently for any
+        # binary not installed. That's acceptable here — reference content is
+        # committed in-tree (refreshed by the reference-sync workflow).
+        continue-on-error: true
+
+      - name: Doctor — culture.dev IA health
+        run: katvan doctor
 
       - uses: ruby/setup-ruby@e65c17d16e57e481586a6a5a0282698790062f92 # v1
         with:
@@ -23,6 +35,7 @@ jobs:
           working-directory: site
 
       - name: Build docs
-        run: bundle exec jekyll build --config _config.base.yml,_config.culture.yml -d _site_culture
+        working-directory: site
+        run: bundle exec jekyll build --config _config.base.yml,_config.culture.yml -d _site_culture --strict_front_matter
         env:
           JEKYLL_ENV: production

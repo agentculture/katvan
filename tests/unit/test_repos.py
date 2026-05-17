@@ -38,13 +38,14 @@ _FIXTURE_REGISTRY = """\
 
 
 def _reset_repos_caches() -> None:
-    """Clear the lru_cache on _find_repo_root / _parse_registry.
+    """Clear the lru_cache on _find_repo_root / _parse_registry / _parse_entries.
 
-    Both are memoized for process lifetime; tests deliberately point them at
+    All are memoized for process lifetime; tests deliberately point them at
     different temp checkouts, so the caches must be cleared between tests.
     """
     repos_mod._find_repo_root.cache_clear()
     repos_mod._parse_registry.cache_clear()
+    repos_mod._parse_entries.cache_clear()
 
 
 @pytest.fixture(autouse=True)
@@ -229,6 +230,139 @@ def test_main_classify_unknown_exits_nonzero(
     rc = repos_mod.main(["--classify", "does-not-exist"])
     assert rc == 1  # EXIT_USER_ERROR
     assert capsys.readouterr().out.strip() == "unknown"
+
+
+# --- entries() / _parse_entries() ----------------------------------------
+
+
+def test_entries_returns_all_scalar_fields(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A registry with every scalar field populated → ``entries()`` carries them."""
+    registry = (
+        "- id: fully\n"
+        "  category: workspace-experience\n"
+        "  maturity: usable\n"
+        "  docs_mode: pull\n"
+        "  description: All fields populated.\n"
+        "  package: fully-pkg\n"
+        "  binary: fully-bin\n"
+        "  docs: https://example.test/docs\n"
+        "  install: pip install fully-pkg\n"
+        "  caveat: handle with care\n"
+    )
+    _write_checkout(tmp_path, registry, monkeypatch)
+    out = repos_mod.entries()
+    assert len(out) == 1
+    entry = out[0]
+    for key in (
+        "id", "category", "maturity", "docs_mode", "description",
+        "package", "binary", "docs", "install", "caveat",
+    ):
+        assert key in entry, f"missing field: {key}"
+    assert entry["id"] == "fully"
+    assert entry["category"] == "workspace-experience"
+    assert entry["caveat"] == "handle with care"
+
+
+def test_entries_skips_list_valued_fields_without_brackets_in_value(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """``related: [a, b]`` style lines are silently dropped (not stored with brackets)."""
+    registry = (
+        "- id: skippy\n"
+        "  category: core-runtime\n"
+        "  docs_mode: pull\n"
+        "  description: Has a related-list line.\n"
+        "  install: [pip, install, skippy]\n"
+    )
+    _write_checkout(tmp_path, registry, monkeypatch)
+    out = repos_mod.entries()
+    assert len(out) == 1
+    entry = out[0]
+    # install is list-shaped → skipped entirely, not stored as a string.
+    assert "install" not in entry
+    # other scalars are still captured.
+    assert entry["docs_mode"] == "pull"
+    assert entry["description"] == "Has a related-list line."
+
+
+def test_entries_multiple_rows_round_trip(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Two consecutive entries both surface, with the first preserved on the second's open."""
+    registry = (
+        "- id: one\n"
+        "  category: core-runtime\n"
+        "  description: First.\n"
+        "- id: two\n"
+        "  category: org-site\n"
+        "  description: Second.\n"
+    )
+    _write_checkout(tmp_path, registry, monkeypatch)
+    out = repos_mod.entries()
+    assert [e["id"] for e in out] == ["one", "two"]
+    assert out[0]["description"] == "First."
+    assert out[1]["description"] == "Second."
+
+
+def test_entries_unreadable_registry_raises_env_error(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A registry path that points at a directory (read fails) surfaces EXIT_ENV_ERROR."""
+    # Build a "checkout" where the registry path is a directory, not a file.
+    site_data = tmp_path / "site" / "_data"
+    site_data.mkdir(parents=True)
+    fake_registry = site_data / "agentculture_repos.yml"
+    fake_registry.mkdir()  # directory instead of file → read_text raises OSError
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.delenv("KATVAN_SIBLINGS_ROOT", raising=False)
+    repos_mod.set_siblings_root(None)
+    with pytest.raises(KatvanError) as exc:
+        repos_mod._parse_entries(fake_registry)
+    assert exc.value.code == 2  # EXIT_ENV_ERROR
+    assert "not readable" in exc.value.message
+
+
+def test_repos_skips_blank_id_entries(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A ``- id:`` line with no value is skipped by ``repos()``."""
+    registry = (
+        "- id:\n"
+        "  docs_mode: pull\n"
+        "- id: real\n"
+        "  docs_mode: skip\n"
+    )
+    _write_checkout(tmp_path, registry, monkeypatch)
+    rows = list(repos_mod.repos())
+    assert [r[0] for r in rows] == ["real"]
+
+
+def test_entries_raises_when_registry_has_content_but_zero_entries(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Belt-and-suspenders: ``_parse_entries`` must guard like ``_parse_registry``.
+
+    A non-empty registry with no inline ``- id:`` openers used to silently
+    yield zero entries from ``_parse_entries``, which let ``doctor`` report
+    "ok (0 repos)" on a malformed file.
+    """
+    registry = "-\n  id: blockstyle\n  docs_mode: pull\n"
+    _write_checkout(tmp_path, registry, monkeypatch)
+    with pytest.raises(KatvanError) as exc:
+        repos_mod.entries()
+    assert exc.value.code == 1  # EXIT_USER_ERROR
+    assert "zero entries" in exc.value.message
+
+
+def test_entries_comment_only_registry_yields_zero_without_erroring(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A comment-only registry is legitimately empty — no raise."""
+    registry = "# only a comment, no entries\n\n   \n"
+    _write_checkout(tmp_path, registry, monkeypatch)
+    assert repos_mod.entries() == []
 
 
 def test_real_registry_is_parseable() -> None:
