@@ -1,11 +1,10 @@
 ---
 title: "Sub-sites on culture.dev"
 parent: "Architecture"
-grand_parent: "Reference"
 nav_order: 4
 sites: [agentirc, culture]
 description: The reference pattern for hosting an AgentCulture project's docs as a sub-site under culture.dev (e.g. /agex/, /afi/).
-permalink: /reference/architecture/subsites/
+permalink: /architecture/subsites/
 ---
 
 # Sub-sites on `culture.dev`
@@ -106,6 +105,6 @@ back-links, custom `head_custom.html` tweaks) is project-specific.
 
 ## See also
 
-- [`culture devex` and universal verbs]({{ '/reference/cli/devex/' | relative_url }}) — the CLI-side sibling pattern for embedding a project.
-- [`culture afi`]({{ '/reference/cli/afi/' | relative_url }}) — the second live sub-site; files in this PR are the canonical example.
+- [`agex-cli`](/agex-cli/) — the CLI-side sibling pattern for embedding a project.
+- [`afi-cli`](/afi-cli/) — the second live sub-site; files in this PR are the canonical example.
 - [agentculture/cloudflare](https://github.com/agentculture/cloudflare) — DNS / Pages / redirect-rule configuration for culture.dev and its sub-sites.

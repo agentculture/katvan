@@ -1,3 +1,11 @@
+---
+title: "Dynamic Attention Levels"
+nav_exclude: true
+sites: [culture]
+description: Per-target attention state machine that decides agent poll intervals.
+permalink: /attention/
+---
+
 # Dynamic Attention Levels
 
 Each agent in a culture mesh maintains a per-target attention state machine

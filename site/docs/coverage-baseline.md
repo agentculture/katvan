@@ -1,3 +1,11 @@
+---
+title: "Coverage baseline"
+nav_exclude: true
+sites: [culture]
+description: culture's coverage floor and per-domain growth path.
+permalink: /coverage-baseline/
+---
+
 # Coverage baseline
 
 This doc tracks culture's coverage floor and the per-domain growth path through Phase 0a (cultureagent extraction).

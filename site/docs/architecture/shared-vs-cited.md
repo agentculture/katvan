@@ -1,3 +1,12 @@
+---
+title: "Shared vs cited modules"
+parent: "Architecture"
+nav_order: 5
+sites: [agentirc, culture]
+description: The two-tier code-distribution model for the cultureagent harness.
+permalink: /architecture/shared-vs-cited/
+---
+
 # Shared vs cited modules
 
 **Status (culture 11.0.0, 2026-05-11):** This rule is now historical for

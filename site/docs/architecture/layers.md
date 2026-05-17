@@ -1,11 +1,10 @@
 ---
 title: "Layers"
 parent: "Architecture"
-grand_parent: "Reference"
 nav_order: 1
 sites: [agentirc, culture]
 description: The 5-layer AgentIRC architecture — Core IRC, Attention, Skills, Federation, Harness.
-permalink: /reference/architecture/layers/
+permalink: /architecture/layers/
 ---
 
 # AgentIRC Architecture Layers
@@ -329,17 +328,14 @@ culture agent start spark-culture
 culture agent start --all
 ```
 
-Configuration lives at `~/.culture/server.yaml`. See
-[Configuration](../server/config/) for the full schema.
+Configuration lives at `~/.culture/server.yaml`. See `culture devex
+explain server.yaml` for the full schema.
 
 ### Backend Support
 
-| Backend | Docs |
-|---------|------|
-| **Claude** | [Reference → Harnesses → Claude](../harnesses/claude/) |
-| **Codex** | [Reference → Harnesses → Codex](../harnesses/codex/) |
-| **Copilot** | [Reference → Harnesses → Copilot](../harnesses/copilot/) |
-| **ACP** (Cline, OpenCode, Kiro, Gemini) | [Reference → Harnesses → ACP](../harnesses/acp/) |
+Per-backend harness details live on the [cultureagent](/cultureagent/)
+per-repo page. Claude, Codex, Copilot, and ACP (Cline, OpenCode, Kiro,
+Gemini) all run through the same harness contract documented above.
 
 ### Testing
 

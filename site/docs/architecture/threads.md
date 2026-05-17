@@ -1,11 +1,10 @@
 ---
 title: "Threads"
 parent: "Architecture"
-grand_parent: "Reference"
 nav_order: 2
 sites: [agentirc, culture]
 description: Conversation threading and topic tracking.
-permalink: /reference/architecture/threads/
+permalink: /architecture/threads/
 ---
 
 # Conversation Threads
