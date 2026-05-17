@@ -2,6 +2,7 @@
 title: Quickstart
 nav_order: 1
 permalink: /quickstart/
+sites: [culture]
 ---
 
 # Quickstart

@@ -275,3 +275,46 @@ def test_pull_one_writes_expected_tree(
     assert (ref / "learn.md").is_file()
     assert (ref / "explain" / "thing.md").is_file()
     assert (ref / "explain" / "thing" / "do.md").is_file()
+
+
+def test_pull_one_clears_reference_before_writes(
+    fake_repo: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Determinism: reference/ is rewritten from scratch each call.
+
+    A noun / verb removed upstream must vanish locally too. We seed the
+    reference tree with a stale file that no longer maps to a current noun
+    and assert that ``_pull_one`` deletes it.
+    """
+    site_root = fake_repo / "site"
+    entry = {"id": "fakecli", "binary": "fakecli", "description": "x"}
+
+    # Seed a stale file at the path of a noun that won't be regenerated.
+    stale = site_root / "docs" / "fakecli" / "reference" / "explain" / "removed-upstream.md"
+    stale.parent.mkdir(parents=True)
+    stale.write_text("stale content from a previous run\n")
+
+    def fake_invoke(binary: str, args: list[str]) -> dict:
+        if args[0] == "learn":
+            return {"summary": "s", "nouns": ["thing"]}
+        if args == ["explain", "thing", "--json"]:
+            return {"verbs": []}
+        raise AssertionError(f"unexpected: {args}")
+
+    monkeypatch.setattr(pull_mod, "_invoke_json", fake_invoke)
+    pull_mod._pull_one(site_root, entry)
+
+    # Stale file is gone, new tree is present.
+    assert not stale.exists(), "stale upstream-removed noun should be deleted"
+    ref = site_root / "docs" / "fakecli" / "reference"
+    assert (ref / "index.md").is_file()
+    assert (ref / "explain" / "thing.md").is_file()
+
+
+def test_render_functions_emit_sites_culture_frontmatter() -> None:
+    """Generated reference markdown must carry ``sites: [culture]`` frontmatter."""
+    entry = {"id": "fakecli"}
+    learn = {"nouns": []}
+    assert "sites: [culture]" in pull_mod._render_index(entry, learn)
+    assert "sites: [culture]" in pull_mod._render_learn(entry, {})
+    assert "sites: [culture]" in pull_mod._render_explain("noun", {})

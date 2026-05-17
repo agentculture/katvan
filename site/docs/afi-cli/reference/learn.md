@@ -1,6 +1,7 @@
 ---
 title: afi-cli learn
 parent: afi-cli reference
+sites: [culture]
 ---
 
 # `afi learn`

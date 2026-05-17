@@ -57,6 +57,16 @@ def _handle(args: argparse.Namespace) -> int:
     warnings: list[dict[str, str]] = []
 
     entries = list(repos.entries())
+    if not entries:
+        failures.append(
+            {
+                "id": "<registry>",
+                "message": (
+                    "registry is empty — no repos to check; "
+                    "verify site/_data/agentculture_repos.yml has entries"
+                ),
+            }
+        )
     for entry in entries:
         for check in (_check_index, _check_reference):
             msg = check(site_root, entry)

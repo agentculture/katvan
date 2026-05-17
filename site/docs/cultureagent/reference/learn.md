@@ -1,6 +1,7 @@
 ---
 title: cultureagent learn
 parent: cultureagent reference
+sites: [culture]
 ---
 
 # `cultureagent learn`

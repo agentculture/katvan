@@ -179,6 +179,23 @@ def test_handle_json_emits_failure_summary(
     assert isinstance(payload["warnings"], list)
 
 
+def test_handle_fails_on_empty_registry(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """Belt-and-suspenders: an empty registry must surface a failure, not 'ok (0 repos)'."""
+    registry = tmp_path / "site" / "_data" / "agentculture_repos.yml"
+    registry.parent.mkdir(parents=True)
+    registry.write_text("# only a comment, no entries\n")
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.delenv("KATVAN_SIBLINGS_ROOT", raising=False)
+    repos_mod.set_siblings_root(None)
+    rc = doctor_mod._handle(argparse.Namespace(json=False))
+    assert rc == 1
+    out = capsys.readouterr().out
+    assert "FAIL [<registry>]" in out
+    assert "registry is empty" in out
+
+
 def test_handle_emits_warnings_for_readme_links(
     fake_repo: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
 ) -> None:

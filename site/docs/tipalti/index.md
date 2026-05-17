@@ -3,6 +3,7 @@ title: tipalti
 parent: Resident Domain
 nav_order: 4
 permalink: /tipalti/
+sites: [culture]
 ---
 
 # tipalti

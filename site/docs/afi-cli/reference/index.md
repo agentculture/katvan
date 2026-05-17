@@ -2,6 +2,7 @@
 title: afi-cli reference
 parent: afi-cli
 nav_order: 1
+sites: [culture]
 ---
 
 # afi-cli reference

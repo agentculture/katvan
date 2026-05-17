@@ -2,6 +2,7 @@
 title: Resident Culture
 parent: Ecosystem
 permalink: /categories/resident-culture/
+sites: [culture]
 ---
 
 # Resident Culture

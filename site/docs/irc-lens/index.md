@@ -3,6 +3,7 @@ title: irc-lens
 parent: Core Runtime
 nav_order: 3
 permalink: /irc-lens/
+sites: [culture]
 ---
 
 # irc-lens

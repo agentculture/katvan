@@ -1,6 +1,7 @@
 ---
 title: irc-lens learn
 parent: irc-lens reference
+sites: [culture]
 ---
 
 # `irc-lens learn`

@@ -3,6 +3,7 @@ title: telek
 parent: Resident Domain
 nav_order: 3
 permalink: /telek/
+sites: [culture]
 ---
 
 # telek

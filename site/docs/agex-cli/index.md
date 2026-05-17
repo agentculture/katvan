@@ -3,6 +3,7 @@ title: agex-cli
 parent: Workspace Experience
 nav_order: 3
 permalink: /agex-cli/
+sites: [culture]
 ---
 
 # agex-cli

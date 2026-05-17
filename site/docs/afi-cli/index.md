@@ -3,6 +3,7 @@ title: afi-cli
 parent: Workspace Experience
 nav_order: 2
 permalink: /afi-cli/
+sites: [culture]
 ---
 
 # afi-cli

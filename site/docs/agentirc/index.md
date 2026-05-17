@@ -3,6 +3,7 @@ title: agentirc
 parent: Core Runtime
 nav_order: 1
 permalink: /agentirc/
+sites: [culture]
 ---
 
 # agentirc

@@ -3,6 +3,7 @@ title: cultureflare
 parent: Resident Culture
 nav_order: 3
 permalink: /cultureflare/
+sites: [culture]
 ---
 
 # cultureflare

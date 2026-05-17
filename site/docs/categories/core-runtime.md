@@ -2,6 +2,7 @@
 title: Core Runtime
 parent: Ecosystem
 permalink: /categories/core-runtime/
+sites: [culture]
 ---
 
 # Core Runtime

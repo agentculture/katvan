@@ -2,6 +2,7 @@
 title: Workspace Experience
 parent: Ecosystem
 permalink: /categories/workspace-experience/
+sites: [culture]
 ---
 
 # Workspace Experience

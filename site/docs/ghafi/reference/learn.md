@@ -1,6 +1,7 @@
 ---
 title: ghafi learn
 parent: ghafi reference
+sites: [culture]
 ---
 
 # `ghafi learn`

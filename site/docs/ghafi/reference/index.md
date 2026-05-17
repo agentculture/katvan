@@ -2,6 +2,7 @@
 title: ghafi reference
 parent: ghafi
 nav_order: 1
+sites: [culture]
 ---
 
 # ghafi reference

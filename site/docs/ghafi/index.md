@@ -3,6 +3,7 @@ title: ghafi
 parent: Resident Culture
 nav_order: 4
 permalink: /ghafi/
+sites: [culture]
 ---
 
 # ghafi

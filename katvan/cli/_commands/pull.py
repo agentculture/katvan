@@ -5,14 +5,18 @@ For each registered repo with ``docs_mode: pull-reference``, invoke
 deterministic markdown into ``site/docs/<id>/reference/``.
 
 Determinism: outputs are sorted, JSON is re-serialised with ``sort_keys``,
-markdown front-matter is identical run-to-run. Re-running pull on unchanged
-sibling state MUST produce a byte-identical tree (CI relies on this to keep
-bot-PR diffs minimal).
+markdown front-matter is identical run-to-run. The per-repo reference tree is
+rewritten from scratch on every call — `_pull_one` deletes
+``site/docs/<id>/reference/`` before any writes, so nouns / verbs removed
+upstream disappear locally too. Re-running pull on unchanged sibling state
+MUST produce a byte-identical tree (CI relies on this to keep bot-PR diffs
+minimal).
 """
 from __future__ import annotations
 
 import argparse
 import json
+import shutil
 import subprocess
 from dataclasses import dataclass
 from pathlib import Path
@@ -97,7 +101,10 @@ def _select_targets(args: argparse.Namespace) -> Iterable[dict[str, str]]:
 def _pull_one(site_root: Path, entry: dict[str, str]) -> None:
     binary = entry.get("binary", entry["id"])
     out = site_root / "docs" / entry["id"] / "reference"
-    out.mkdir(parents=True, exist_ok=True)
+    # Wipe and recreate so removed-upstream nouns / verbs disappear locally
+    # too — pulling MUST yield a tree that exactly reflects current upstream.
+    shutil.rmtree(out, ignore_errors=True)
+    out.mkdir(parents=True)
 
     learn_json = _invoke_json(binary, ["learn", "--json"])
     (out / "learn.md").write_text(_render_learn(entry, learn_json))
@@ -136,7 +143,8 @@ def _invoke_json(binary: str, args: list[str]) -> dict:
 
 def _render_index(entry: dict, learn: dict) -> str:
     return (
-        f"---\ntitle: {entry['id']} reference\nparent: {entry['id']}\nnav_order: 1\n---\n\n"
+        f"---\ntitle: {entry['id']} reference\nparent: {entry['id']}\n"
+        f"nav_order: 1\nsites: [culture]\n---\n\n"
         f"# {entry['id']} reference\n\n"
         f"{learn.get('summary', entry.get('description', ''))}\n\n"
         f"- [learn](learn.md)\n"
@@ -148,7 +156,8 @@ def _render_index(entry: dict, learn: dict) -> str:
 
 def _render_learn(entry: dict, payload: dict) -> str:
     return (
-        f"---\ntitle: {entry['id']} learn\nparent: {entry['id']} reference\n---\n\n"
+        f"---\ntitle: {entry['id']} learn\nparent: {entry['id']} reference\n"
+        f"sites: [culture]\n---\n\n"
         f"# `{entry.get('binary', entry['id'])} learn`\n\n"
         f"```json\n{json.dumps(payload, indent=2, sort_keys=True)}\n```\n"
     )
@@ -156,7 +165,7 @@ def _render_learn(entry: dict, payload: dict) -> str:
 
 def _render_explain(path: str, payload: dict) -> str:
     return (
-        f"---\ntitle: explain {path}\n---\n\n"
+        f"---\ntitle: explain {path}\nsites: [culture]\n---\n\n"
         f"# `explain {path}`\n\n"
         f"```json\n{json.dumps(payload, indent=2, sort_keys=True)}\n```\n"
     )

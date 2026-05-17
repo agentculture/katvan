@@ -2,6 +2,7 @@
 title: Resident Domain
 parent: Ecosystem
 permalink: /categories/resident-domain/
+sites: [culture]
 ---
 
 # Resident Domain

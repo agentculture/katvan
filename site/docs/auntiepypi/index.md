@@ -3,6 +3,7 @@ title: auntiepypi
 parent: Resident Culture
 nav_order: 2
 permalink: /auntiepypi/
+sites: [culture]
 ---
 
 # auntiepypi

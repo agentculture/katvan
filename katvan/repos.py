@@ -210,11 +210,13 @@ def _parse_entries(path: Path) -> tuple[dict[str, str], ...]:
     )
 
     entries: list[dict[str, str]] = []
+    has_content = False
     cur: dict[str, str] | None = None
     for line in raw.splitlines():
         stripped = line.strip()
         if not stripped or stripped.startswith("#"):
             continue
+        has_content = True
         if stripped.startswith("- id:"):
             if cur is not None:
                 entries.append(cur)
@@ -234,6 +236,15 @@ def _parse_entries(path: Path) -> tuple[dict[str, str], ...]:
                     break
     if cur is not None:
         entries.append(cur)
+
+    if not entries and has_content:
+        raise KatvanError(
+            code=EXIT_USER_ERROR,
+            message="registry has content but parsed zero entries",
+            remediation=(
+                "check YAML formatting — entries must start with '- id: <id>'"
+            ),
+        )
     return tuple(entries)
 
 

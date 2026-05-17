@@ -3,6 +3,7 @@ title: code-lens-cli
 parent: Workspace Experience
 nav_order: 5
 permalink: /code-lens-cli/
+sites: [culture]
 ---
 
 # code-lens-cli

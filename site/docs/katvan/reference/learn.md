@@ -1,6 +1,7 @@
 ---
 title: katvan learn
 parent: katvan reference
+sites: [culture]
 ---
 
 # `katvan learn`
@@ -51,6 +52,6 @@ parent: katvan reference
   "json_support": true,
   "purpose": "Maintain sibling-repo docs under one roof on the culture.dev site.",
   "tool": "katvan",
-  "version": "0.1.0"
+  "version": "0.2.0"
 }
 ```

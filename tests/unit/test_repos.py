@@ -339,6 +339,32 @@ def test_repos_skips_blank_id_entries(
     assert [r[0] for r in rows] == ["real"]
 
 
+def test_entries_raises_when_registry_has_content_but_zero_entries(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Belt-and-suspenders: ``_parse_entries`` must guard like ``_parse_registry``.
+
+    A non-empty registry with no inline ``- id:`` openers used to silently
+    yield zero entries from ``_parse_entries``, which let ``doctor`` report
+    "ok (0 repos)" on a malformed file.
+    """
+    registry = "-\n  id: blockstyle\n  docs_mode: pull\n"
+    _write_checkout(tmp_path, registry, monkeypatch)
+    with pytest.raises(KatvanError) as exc:
+        repos_mod.entries()
+    assert exc.value.code == 1  # EXIT_USER_ERROR
+    assert "zero entries" in exc.value.message
+
+
+def test_entries_comment_only_registry_yields_zero_without_erroring(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A comment-only registry is legitimately empty — no raise."""
+    registry = "# only a comment, no entries\n\n   \n"
+    _write_checkout(tmp_path, registry, monkeypatch)
+    assert repos_mod.entries() == []
+
+
 def test_real_registry_is_parseable() -> None:
     """Sanity check against the live registry (when run from a katvan checkout)."""
     # This test is environment-dependent; skip gracefully if not in a checkout.

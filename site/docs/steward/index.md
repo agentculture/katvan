@@ -3,6 +3,7 @@ title: steward
 parent: Resident Culture
 nav_order: 6
 permalink: /steward/
+sites: [culture]
 ---
 
 # steward
