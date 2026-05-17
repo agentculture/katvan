@@ -1,0 +1,14 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "katvan",
+  "compatibility_date": "2026-05-17",
+  "observability": {
+    "enabled": true
+  },
+  "assets": {
+    "directory": "_site_culture"
+  },
+  "compatibility_flags": [
+    "nodejs_compat"
+  ]
+}
