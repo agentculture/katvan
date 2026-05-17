@@ -1,0 +1,8 @@
+{% if site.analytics_host and site.analytics_domain %}
+<script defer
+        data-domain="{{ site.analytics_domain }}"
+        src="{{ site.analytics_host }}/js/script.outbound-links.js"></script>
+<script>
+  window.plausible = window.plausible || function() { (window.plausible.q = window.plausible.q || []).push(arguments) }
+</script>
+{% endif %}

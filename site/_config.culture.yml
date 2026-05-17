@@ -14,6 +14,11 @@ social:
   links:
     - https://github.com/agentculture/culture
 
+# Plausible analytics — uncomment once self-hosted Plausible instance is live.
+# Tracked OOS in agentculture/katvan#XX (Plausible host infrastructure).
+# analytics_host: "https://plausible.culture.dev"
+# analytics_domain: "culture.dev"
+
 author:
   name: Ori Nachum
   twitter: AgenticHumanOrg
