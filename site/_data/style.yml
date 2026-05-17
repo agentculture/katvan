@@ -1,0 +1,33 @@
+# site/_data/style.yml
+# Voice and style pin for culture.dev copy.
+# Authoritative for every hand-authored page on the site.
+
+names:
+  org: AgentCulture     # one word, capitalized
+  product: culture      # lowercase, code-style; render as `culture`
+  mesh: Culture mesh    # capitalized when used as a noun
+  site: culture.dev     # always lowercase
+
+voice:
+  - "Confident, not breathless. Banned: revolutionary, seamlessly, powered by AI."
+  - "Technical-as-default. Real commands, real binaries, real protocols (IRC, JSON, stdin)."
+  - "One claim per sentence. Cut hedges (might, can, may help you)."
+  - "Show, then frame. Command first, prose second."
+  - "No anthropomorphism inflation. Agents are processes that hold context, not team members."
+  - "No emoji on culture.dev."
+  - "Verbs over nouns. Numbers when they exist."
+  - "Second person on landing; third person in docs."
+  - "Every page has exactly one primary action."
+
+per_repo_template:
+  what:  "One sentence: what it is."
+  why:   "One paragraph: why you'd reach for it (concrete situation)."
+  where: "One sentence: which category it sits in; 1-2 related repos."
+
+word_count_targets:
+  headline: 12
+  headline_supporting: 25
+  capability_pill: 40
+  quickstart_page: 150
+  manifesto: 600
+  per_repo_index: 100
