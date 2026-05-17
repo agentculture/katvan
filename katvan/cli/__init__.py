@@ -29,6 +29,7 @@ from katvan import __version__
 from katvan.cli._commands import explain as _explain_cmd
 from katvan.cli._commands import learn as _learn_cmd
 from katvan.cli._commands import overview as _overview_cmd
+from katvan.cli._commands import pull as _pull_cmd
 from katvan.cli._errors import EXIT_INTERNAL_ERROR, EXIT_USER_ERROR, KatvanError
 from katvan.cli._output import emit_error
 
@@ -85,8 +86,9 @@ def _build_parser() -> argparse.ArgumentParser:
     _learn_cmd.register(sub)
     _explain_cmd.register(sub)
     _overview_cmd.register(sub)
-    # The remaining docs verbs — pull / doctor — register here in a later
-    # release once they are ported from the librarian skill.
+    _pull_cmd.register(sub)
+    # The remaining docs verb — doctor — registers here in a later release
+    # once it is ported from the librarian skill.
 
     return parser
 
