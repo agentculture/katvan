@@ -28,6 +28,7 @@ import sys
 from katvan import __version__
 from katvan.cli._commands import explain as _explain_cmd
 from katvan.cli._commands import learn as _learn_cmd
+from katvan.cli._commands import overview as _overview_cmd
 from katvan.cli._errors import EXIT_INTERNAL_ERROR, EXIT_USER_ERROR, KatvanError
 from katvan.cli._output import emit_error
 
@@ -83,7 +84,8 @@ def _build_parser() -> argparse.ArgumentParser:
     # Globals (top-level, not nested under a noun).
     _learn_cmd.register(sub)
     _explain_cmd.register(sub)
-    # The docs verbs — overview / pull / doctor — register here in a later
+    _overview_cmd.register(sub)
+    # The remaining docs verbs — pull / doctor — register here in a later
     # release once they are ported from the librarian skill.
 
     return parser

@@ -179,6 +179,76 @@ def repos() -> Iterator[tuple[str, str, str]]:
         yield rid, mode, local_path(rid)
 
 
+@functools.lru_cache(maxsize=None)
+def _parse_entries(path: Path) -> tuple[dict[str, str], ...]:
+    """Return a tuple of full-entry dicts for every registry row.
+
+    Extends :func:`_parse_registry`'s line-oriented parser to capture every
+    scalar field (``id``, ``category``, ``maturity``, ``docs_mode``,
+    ``description``, ``package``, ``binary``, ``docs``, ``install``,
+    ``caveat``) on the entry. List-valued fields (e.g. ``related``) are
+    skipped — the overview verb only needs scalars, and bringing in PyYAML
+    just to parse them would violate the stdlib-only invariant.
+
+    Memoized on ``path`` for the same reasons as :func:`_parse_registry`.
+    """
+    try:
+        raw = path.read_text(encoding="utf-8")
+    except OSError as err:
+        raise KatvanError(
+            code=EXIT_ENV_ERROR,
+            message=f"registry not readable: {path}: {err}",
+            remediation="check the file exists and is readable",
+        ) from err
+
+    # Scalar fields we care about. Anything else (e.g. ``related:`` which is
+    # a YAML list) is ignored — the line-oriented parser doesn't grok lists,
+    # and the overview verb does not need them.
+    _SCALAR_FIELDS = (
+        "category", "maturity", "docs_mode", "description",
+        "package", "binary", "docs", "install", "caveat",
+    )
+
+    entries: list[dict[str, str]] = []
+    cur: dict[str, str] | None = None
+    for line in raw.splitlines():
+        stripped = line.strip()
+        if not stripped or stripped.startswith("#"):
+            continue
+        if stripped.startswith("- id:"):
+            if cur is not None:
+                entries.append(cur)
+            rid = stripped.split(":", 1)[1].strip().strip("'\"")
+            cur = {"id": rid, "docs_mode": "skip"}
+        elif cur is not None:
+            for field in _SCALAR_FIELDS:
+                prefix = f"{field}:"
+                if stripped.startswith(prefix):
+                    value = stripped.split(":", 1)[1].strip().strip("'\"")
+                    # Skip list-valued lines like ``related: [a, b]`` —
+                    # caller doesn't need them and our stripping would
+                    # leave brackets in the value.
+                    if value.startswith("["):
+                        break
+                    cur[field] = value
+                    break
+    if cur is not None:
+        entries.append(cur)
+    return tuple(entries)
+
+
+def entries() -> list[dict[str, str]]:
+    """Return a list of full-entry dicts for every registry row.
+
+    Each dict carries at least ``id`` and ``docs_mode`` (defaulting to
+    ``"skip"`` if absent); other scalar fields (``category``, ``maturity``,
+    ``description``, ``package``, ``binary``, ``docs``, ``install``,
+    ``caveat``) are present when set on the entry. The overview verb groups
+    on ``category`` and surfaces ``id`` + ``description``.
+    """
+    return [dict(e) for e in _parse_entries(registry_path())]
+
+
 def classify(repo_id: str) -> str:
     """Return the ``docs_mode`` for ``repo_id``.
 
