@@ -233,3 +233,16 @@ skipped per Task 18 spec.
 - katvan — skipped (this repo; handled via the rebuild PR itself, not a self-issue)
 
 No errors encountered.
+
+## OOS tracking issues filed in katvan (2026-05-18)
+
+- #14 — Visual / design uplift
+- #15 — Sibling Jekyll teardown coordination
+- #16 — Tutorials
+- #17 — Blog / changelog / case studies
+- #18 — Comparison-vs-X
+- #19 — Public roadmap
+- #20 — Docs versioning
+- #21 — A/B testing
+- #22 — AI-crawler / SEO
+- #23 — Plausible host infrastructure
