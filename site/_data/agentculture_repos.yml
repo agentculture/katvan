@@ -52,12 +52,13 @@
 - id: culture
   category: workspace-experience
   maturity: usable
-  docs_mode: pull-reference
+  docs_mode: skip
   description: The integrated workspace — CLI, harnesses, console, mesh.
   package: culture
   binary: culture
   docs: https://culture.dev
   install: uv tool install culture
+  caveat: "Reference sync deferred — `culture learn` does not yet support `--json`."
 
 - id: cultureagent
   category: core-runtime
@@ -72,9 +73,11 @@
 - id: agex-cli
   category: workspace-experience
   maturity: experimental
-  docs_mode: pull-reference
+  docs_mode: skip
   description: Improve an agent's developer experience; powers `culture devex`.
+  binary: agex
   docs: https://culture.dev/agex/
+  caveat: "Reference sync deferred — `agex learn` does not yet support `--json`."
   related: [culture]
 
 - id: afi-cli
@@ -82,6 +85,7 @@
   maturity: usable
   docs_mode: pull-reference
   description: Agent-First Interface — contracts agents publish about themselves.
+  binary: afi
   docs: https://culture.dev/afi/
   caveat: "Exposed today as `culture afi` (passthrough); planned rename to `culture contract`."
   related: [culture]
