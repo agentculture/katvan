@@ -72,12 +72,17 @@ def fake_repo(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     repos_mod.set_siblings_root(None)
 
 
-# --- _group_by_category ----------------------------------------------------
+# --- category grouping (inlined into _handle) ------------------------------
 
 
-def test_group_by_category_buckets_all_six_known_categories(fake_repo: Path) -> None:
-    grouped = overview_mod._group_by_category()
-    assert set(grouped) >= {
+def test_handle_json_groups_all_six_known_categories(
+    fake_repo: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """JSON mode surfaces every known category bucket from the fixture."""
+    rc = overview_mod._handle(argparse.Namespace(json=True))
+    assert rc == 0
+    by_cat = json.loads(capsys.readouterr().out)["by_category"]
+    assert set(by_cat) >= {
         "workspace-experience",
         "core-runtime",
         "identity-secrets",
@@ -85,19 +90,23 @@ def test_group_by_category_buckets_all_six_known_categories(fake_repo: Path) -> 
         "resident-domain",
         "org-site",
     }
-    for ids in grouped.values():
+    for ids in by_cat.values():
         assert all(isinstance(e, dict) for e in ids)
 
 
-def test_group_by_category_keeps_unknown_categories(fake_repo: Path) -> None:
+def test_handle_json_keeps_unknown_categories(
+    fake_repo: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
     """A registry with a category not in ``_CATEGORY_ORDER`` still groups it.
 
-    This exercises the defaultdict semantics in ``_group_by_category`` — the
-    overview text mode then silently drops the unknown bucket (no `KeyError`).
+    This exercises the defaultdict semantics in ``_handle`` — the overview
+    text mode then silently drops the unknown bucket (no `KeyError`).
     """
-    grouped = overview_mod._group_by_category()
-    assert "experimental-future-thing" in grouped
-    assert grouped["experimental-future-thing"][0]["id"] == "oddball"
+    rc = overview_mod._handle(argparse.Namespace(json=True))
+    assert rc == 0
+    by_cat = json.loads(capsys.readouterr().out)["by_category"]
+    assert "experimental-future-thing" in by_cat
+    assert by_cat["experimental-future-thing"][0]["id"] == "oddball"
 
 
 # --- _handle: text mode ----------------------------------------------------

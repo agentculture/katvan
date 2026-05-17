@@ -31,15 +31,10 @@ def register(sub: argparse._SubParsersAction) -> None:
     parser.set_defaults(func=_handle)
 
 
-def _group_by_category() -> dict[str, list[dict[str, Any]]]:
+def _handle(args: argparse.Namespace) -> int:
     grouped: dict[str, list[dict[str, Any]]] = defaultdict(list)
     for entry in repos.entries():
         grouped[entry["category"]].append(entry)
-    return grouped
-
-
-def _handle(args: argparse.Namespace) -> int:
-    grouped = _group_by_category()
     total = sum(len(v) for v in grouped.values())
 
     if args.json:

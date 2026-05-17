@@ -311,6 +311,48 @@ def test_pull_one_clears_reference_before_writes(
     assert (ref / "explain" / "thing.md").is_file()
 
 
+def test_pull_one_preserves_existing_tree_when_binary_missing(
+    fake_repo: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Regression guard: when ``_invoke_json`` raises on the first ``learn`` call
+    (e.g. the sibling binary isn't installed in CI), the existing committed
+    ``reference/`` tree MUST be left intact — no destructive rmtree before we
+    know we have replacement content.
+    """
+    site_root = fake_repo / "site"
+    entry = {"id": "fakecli", "binary": "fakecli", "description": "x"}
+
+    # Seed a committed reference tree that resembles what CI would have on disk.
+    ref = site_root / "docs" / "fakecli" / "reference"
+    (ref / "explain").mkdir(parents=True)
+    index = ref / "index.md"
+    index.write_text("# committed reference content\n")
+    learn_md = ref / "learn.md"
+    learn_md.write_text("# committed learn\n")
+    explain_stub = ref / "explain" / "noun.md"
+    explain_stub.write_text("# committed explain\n")
+
+    def fake_invoke(binary: str, args: list[str]) -> dict:
+        # Simulate the sibling binary being absent — same shape as the real
+        # error from ``_invoke_json`` when the subprocess call fails.
+        raise KatvanError(
+            code=EXIT_INTERNAL_ERROR,
+            message=f"{binary} not found",
+            remediation="install it",
+        )
+
+    monkeypatch.setattr(pull_mod, "_invoke_json", fake_invoke)
+
+    with pytest.raises(KatvanError):
+        pull_mod._pull_one(site_root, entry)
+
+    # Committed content survives — the rmtree must NOT have run.
+    assert index.is_file(), "committed reference/index.md must be preserved"
+    assert learn_md.is_file(), "committed reference/learn.md must be preserved"
+    assert explain_stub.is_file(), "committed explain stub must be preserved"
+    assert index.read_text() == "# committed reference content\n"
+
+
 def test_render_functions_emit_sites_culture_frontmatter() -> None:
     """Generated reference markdown must carry ``sites: [culture]`` frontmatter."""
     entry = {"id": "fakecli"}

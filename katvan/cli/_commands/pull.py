@@ -49,7 +49,7 @@ def register(sub: argparse._SubParsersAction) -> None:
     parser.set_defaults(func=_handle)
 
 
-def _handle(args: argparse.Namespace) -> int:
+def _require_target_selector(args: argparse.Namespace) -> None:
     if not args.repo and not args.all:
         raise KatvanError(
             code=EXIT_USER_ERROR,
@@ -57,30 +57,42 @@ def _handle(args: argparse.Namespace) -> int:
             remediation="examples: katvan pull culture | katvan pull --all",
         )
 
+
+def _process_entry(site_root: Path, entry: dict[str, str], result: _PullResult) -> None:
+    repo_id = entry["id"]
+    if entry.get("docs_mode") != "pull-reference":
+        result.skipped.append(repo_id)
+        return
+    try:
+        _pull_one(site_root, entry)
+        result.pulled.append(repo_id)
+    except Exception as err:  # noqa: BLE001
+        result.failed.append({"id": repo_id, "error": str(err)})
+
+
+def _emit_text_result(result: _PullResult) -> None:
+    for rid in result.pulled:
+        print(f"pulled: {rid}")
+    for rid in result.skipped:
+        print(f"skipped: {rid}")
+    for fail in result.failed:
+        print(f"failed: {fail['id']}: {fail['error']}")
+
+
+def _handle(args: argparse.Namespace) -> int:
+    _require_target_selector(args)
+
     targets = list(_select_targets(args))
     result = _PullResult(pulled=[], skipped=[], failed=[])
     site_root = repos.registry_path().parent.parent
 
     for entry in targets:
-        repo_id = entry["id"]
-        if entry.get("docs_mode") != "pull-reference":
-            result.skipped.append(repo_id)
-            continue
-        try:
-            _pull_one(site_root, entry)
-            result.pulled.append(repo_id)
-        except Exception as err:  # noqa: BLE001
-            result.failed.append({"id": repo_id, "error": str(err)})
+        _process_entry(site_root, entry, result)
 
     if args.json:
         emit_result(vars(result), json_mode=True)
     else:
-        for rid in result.pulled:
-            print(f"pulled: {rid}")
-        for rid in result.skipped:
-            print(f"skipped: {rid}")
-        for fail in result.failed:
-            print(f"failed: {fail['id']}: {fail['error']}")
+        _emit_text_result(result)
 
     return 1 if result.failed else 0
 
@@ -101,12 +113,17 @@ def _select_targets(args: argparse.Namespace) -> Iterable[dict[str, str]]:
 def _pull_one(site_root: Path, entry: dict[str, str]) -> None:
     binary = entry.get("binary", entry["id"])
     out = site_root / "docs" / entry["id"] / "reference"
-    # Wipe and recreate so removed-upstream nouns / verbs disappear locally
-    # too — pulling MUST yield a tree that exactly reflects current upstream.
-    shutil.rmtree(out, ignore_errors=True)
-    out.mkdir(parents=True)
 
+    # Fetch learn first. If the binary isn't installed in this environment
+    # (CI lanes that don't pre-install every sibling), we fail HERE — leaving
+    # the existing committed reference tree intact. The destructive rmtree
+    # below only runs once we know we have replacement data, so removed-
+    # upstream nouns / verbs disappear locally too.
     learn_json = _invoke_json(binary, ["learn", "--json"])
+
+    shutil.rmtree(out, ignore_errors=True)
+    out.mkdir(parents=True, exist_ok=True)
+
     (out / "learn.md").write_text(_render_learn(entry, learn_json))
 
     explain_root = out / "explain"
