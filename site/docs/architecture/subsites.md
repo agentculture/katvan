@@ -72,7 +72,7 @@ entries in the same files are the prior example.
 | `_data/sites.yml` | Add `<project>: https://culture.dev/<project>/`. Centralises every cross-site URL so links never hard-code the origin. |
 | `_config.culture.yml` (`aux_links:`) | Add `"Display Name": - "https://culture.dev/<project>/"` — shows up in the top nav bar. |
 | `_config.culture.yml` (`footer_content:`) | Add a one-line description + link, parallel to the agex / afi entries. |
-| `_includes/head_custom.html` | Add `<link rel="related" href="{{ site.data.sites.<project> }}" title="Display Name">` so cross-site discovery is declarative. |
+| `_includes/head_custom.html` | Add `<link rel="related" href="{% raw %}{{ site.data.sites.<project> }}{% endraw %}" title="Display Name">` so cross-site discovery is declarative. |
 | `sitemap.html` | Add a `<sitemap>` entry pointing at `/<project>/sitemap.xml` (see the `afi` and `agex` lines in this file) so search engines see the sub-site. |
 
 That is the whole culture-side cost. No `_config.culture.yml` routing

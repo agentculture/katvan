@@ -138,3 +138,62 @@ or rewritten by this task — Task 13 applies these decisions.
 5. **The single `defer`** is `shared/demos/magic-demo.md` — its disposition
    depends on whether the new hero asciinema cast (Task 11) reuses any of
    its content.
+
+## Application log (Task 13, 2026-05-18)
+
+Decisions applied in five commits on `feat/culture-dev-marketing-rebuild`.
+Of the 73 in-scope files, the new IA pages locked in Tasks 7-12 turned out
+to be tight enough that almost every "fold" decision was discharged as
+"retire" under the audit's "be ruthless" rule. The new `/why/`,
+`/quickstart/`, `/ecosystem/`, per-repo `/docs/<id>/`, and category pages
+already say what the old long-form pages were saying, with better voice.
+
+| Commit | Group | Files | Net |
+|---|---|---|---|
+| `90328c0` | Retire agentirc feature reference pages | 7 | -1207 |
+| `591f6cb` | Retire central `/reference/` hub and stubs | 14 | -2046 |
+| `dbe88aa` | Promote `/architecture/*` + retire stubs | 14 | +59/-107 |
+| `d05f8a0` | Retire superseded `culture/*` deep-dives | 10 | -1091 |
+| `b8209a9` | Retire remaining fold-source pages | 27 | -4662 |
+
+Decision-by-decision outcome:
+
+- **6 keep** — all 6 honored. The 4 under `reference/architecture/` were
+  moved to `/architecture/` (per spec); `attention.md` and
+  `coverage-baseline.md` stay at root with their existing permalinks.
+  All 6 picked up proper frontmatter (the 3 that lacked it: `attention`,
+  `coverage-baseline`, `shared-vs-cited`). Added `architecture/index.md`
+  as a parent landing page for the subtree.
+- **35 fold** — discharged as: 0 fold-into-existing, 35 retire. Rationale
+  on every culture/* and shared/* file: prose is longer / weaker / has
+  emoji / duplicates the new locked copy. The new `culture/index.md`,
+  `agentirc/index.md`, and `cultureagent/index.md` already supersede the
+  old long-form prose. The single fold that genuinely had unique prose
+  (`reference/server/index.md`: "custom async Python IRCd ... ~4,300
+  lines") was retired rather than degrade the tight new agentirc/index.md
+  by appending implementation trivia.
+- **31 retire** — all 31 honored.
+- **1 defer** (`shared/demos/magic-demo.md`) — flipped to **retire**. The
+  Task 11 hero band is authoring a fresh asciinema cast; the old walkthrough
+  is not reused.
+
+Cross-cutting outcomes:
+
+- The `/quickstart/` permalink conflict between `docs/culture/quickstart.md`
+  and `docs/quickstart.md` is gone — the old file was retired (Task 8's new
+  copy is authoritative).
+- Build is clean: `bundle exec jekyll build` produces no permalink conflicts
+  and no real errors. One pre-existing-style Liquid warning was fixed by
+  wrapping a `<project>` placeholder in `{% raw %}` in `architecture/subsites.md`.
+- `katvan doctor` shows only the expected baseline FAILs: 9 `missing
+  site/docs/<repo>/reference/index.md` for `pull-reference` repos that
+  haven't been pulled in CI yet (`afi-cli`, `agex-cli`, `agtag`,
+  `auntiepypi`, `code-lens-cli`, `culture`, `cultureagent`, `ghafi`,
+  `irc-lens`). All WARNs are sibling-repo README link-back issues
+  (Task 18 / 19, not Task 13).
+- The empty `site/docs/reference/` and `site/docs/shared/` directory trees
+  were removed entirely once their last files were retired.
+
+No file remains with a "defer" decision unresolved. No file from the audit
+was missed; no new files appeared in `site/docs/` since the audit was
+taken.
