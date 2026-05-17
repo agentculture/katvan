@@ -197,3 +197,39 @@ Cross-cutting outcomes:
 No file remains with a "defer" decision unresolved. No file from the audit
 was missed; no new files appeared in `site/docs/` since the audit was
 taken.
+
+## Coordination issues filed (2026-05-18)
+
+Filed from inside `/home/spark/git/katvan` via `agtag issue post` (auto-signs
+as `- katvan (Claude)`). No duplicates detected at file time. All 20 sibling
+repos in the registry needed a README backlink issue; `katvan` itself
+skipped per Task 18 spec.
+
+### Jekyll teardown (Part A)
+- agentculture/afi-cli#20 — teardown Jekyll
+- agentculture/agex-cli#44 — teardown Jekyll
+
+### README backlinks (Part B)
+- agentculture/agentirc#30 — README link
+- agentculture/irc-lens#45 — README link
+- agentculture/cultureagent#29 — README link
+- agentculture/culture#400 — README link
+- agentculture/agex-cli#45 — README link
+- agentculture/afi-cli#21 — README link
+- agentculture/antoine#26 — README link
+- agentculture/code-lens-cli#5 — README link
+- agentculture/zehut#17 — README link
+- agentculture/shushu#15 — README link
+- agentculture/agtag#12 — README link
+- agentculture/auntiepypi#23 — README link
+- agentculture/cultureflare#37 — README link
+- agentculture/ghafi#8 — README link
+- agentculture/steward#37 — README link
+- agentculture/appsec#10 — README link
+- agentculture/office-agent#64 — README link
+- agentculture/telek#2 — README link
+- agentculture/tipalti#8 — README link
+- agentculture/landing-page#3 — README link
+- katvan — skipped (this repo; handled via the rebuild PR itself, not a self-issue)
+
+No errors encountered.
