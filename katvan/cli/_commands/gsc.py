@@ -17,13 +17,9 @@ import argparse
 from katvan.cli._errors import EXIT_USER_ERROR, KatvanError
 from katvan.cli._output import emit_result
 from katvan.gsc.client import build_client, site_url
+from katvan.gsc.doctor import run_doctor
 from katvan.gsc.inspect import inspect_url
 from katvan.gsc.sitemaps import list_sitemaps
-
-# Note: ``run_doctor`` is imported lazily inside ``_cmd_doctor``. Module-level
-# import here triggers a circular dependency: ``doctor`` imports
-# ``_sitemap_fetch``, which reaches into ``katvan.cli._errors``, which forces
-# ``katvan.cli/__init__.py`` to (re-)run and tries to import this very file.
 
 
 # ----- subcommand handlers -----------------------------------------------------
@@ -73,8 +69,6 @@ def _cmd_inspect(args: argparse.Namespace) -> int:
 
 
 def _cmd_doctor(args: argparse.Namespace) -> int:
-    from katvan.gsc.doctor import run_doctor  # see import-section note
-
     client = build_client()
     report = run_doctor(client, site_url=site_url())
     json_mode = bool(getattr(args, "json", False))

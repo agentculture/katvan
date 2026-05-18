@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from katvan.cli._errors import EXIT_USER_ERROR, KatvanError
+from katvan._errors import EXIT_USER_ERROR, KatvanError
 
 
 def inspect_url(client: Any, *, url: str, site_url: str) -> dict[str, Any]:

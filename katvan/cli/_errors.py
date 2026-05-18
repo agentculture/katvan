@@ -1,44 +1,20 @@
-"""KatvanError and exit-code policy.
+"""Backward-compatibility shim.
 
-Every failure inside katvan raises :class:`KatvanError`. The top-level
-``main()`` catches it, formats via :mod:`katvan.cli._output`, and exits with
-:attr:`KatvanError.code`. This guarantees:
-
-* no Python traceback leaks to stderr (agent-first error rubric);
-* every error has a structured shape ``{code, message, remediation}``;
-* the exit-code policy is centralised in one place.
+The real definitions live at :mod:`katvan._errors`. This module exists so
+existing imports (``from katvan.cli._errors import ...``) keep working.
 """
+from katvan._errors import (
+    EXIT_ENV_ERROR,
+    EXIT_INTERNAL_ERROR,
+    EXIT_SUCCESS,
+    EXIT_USER_ERROR,
+    KatvanError,
+)
 
-from __future__ import annotations
-
-from dataclasses import dataclass
-
-# Exit-code policy. Documented in ``katvan learn`` output.
-# 0      = success
-# 1      = user-input error (bad flag, missing required arg, unknown path)
-# 2      = environment / setup error (tool not installed, file unreadable)
-# 3      = internal/unexpected error (a bug in katvan)
-# 4+     = reserved for future categorisation
-EXIT_SUCCESS = 0
-EXIT_USER_ERROR = 1
-EXIT_ENV_ERROR = 2
-EXIT_INTERNAL_ERROR = 3
-
-
-@dataclass
-class KatvanError(Exception):
-    """Structured error raised within katvan; carries a remediation hint for agents."""
-
-    code: int
-    message: str
-    remediation: str = ""
-
-    def __post_init__(self) -> None:
-        super().__init__(self.message)
-
-    def to_dict(self) -> dict[str, object]:
-        return {
-            "code": self.code,
-            "message": self.message,
-            "remediation": self.remediation,
-        }
+__all__ = [
+    "EXIT_ENV_ERROR",
+    "EXIT_INTERNAL_ERROR",
+    "EXIT_SUCCESS",
+    "EXIT_USER_ERROR",
+    "KatvanError",
+]

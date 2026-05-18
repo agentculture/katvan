@@ -22,7 +22,7 @@ from defusedxml import ElementTree as ET
 if TYPE_CHECKING:
     from xml.etree.ElementTree import Element  # nosec B405 - typing only; runtime parsing uses defusedxml
 
-from katvan.cli._errors import EXIT_ENV_ERROR, KatvanError
+from katvan._errors import EXIT_ENV_ERROR, KatvanError
 
 SITEMAP_NS = "{http://www.sitemaps.org/schemas/sitemap/0.9}"
 _USER_AGENT = "katvan-gsc/1 (+https://github.com/agentculture/katvan)"

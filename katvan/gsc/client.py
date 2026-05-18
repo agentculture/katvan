@@ -20,7 +20,7 @@ from typing import Any
 from google.oauth2 import service_account
 from googleapiclient import discovery
 
-from katvan.cli._errors import EXIT_ENV_ERROR, KatvanError
+from katvan._errors import EXIT_ENV_ERROR, KatvanError
 
 SCOPE = "https://www.googleapis.com/auth/webmasters.readonly"
 DEFAULT_SITE_URL = "https://culture.dev/"
