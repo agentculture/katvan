@@ -9,6 +9,8 @@ artifacts.
 
 ## [Unreleased]
 
+## [0.3.1] — 2026-05-18
+
 ### Changed
 
 - Site front door (`site/`): hero now leads with the "function call vs
