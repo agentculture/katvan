@@ -9,15 +9,10 @@ artifacts.
 
 ## [Unreleased]
 
-## [0.2.1] — 2026-05-18
+## [0.2.2] — 2026-05-18
 
 ### Fixed
 
-- `site/sitemap.xml` is now a single flat `<urlset>` covering every real
-  page under culture.dev. Previously it was a `<sitemapindex>` pointing
-  at five sub-sitemaps, three of which (`/agex/sitemap.xml`,
-  `/afi/sitemap.xml`, `/citation-cli/sitemap.xml`) were 404s. The split
-  templates `sitemap-main.html` / `sitemap-agentirc.html` are removed.
 - Left navigation now renders on the landing page at `/`. The home
   layout used to be a standalone `<html>` document that bypassed the
   just-the-docs `default` layout; it is now nested under `default` so
