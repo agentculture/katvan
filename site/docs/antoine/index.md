@@ -18,5 +18,5 @@ records the trace and emits a Kata you can replay, share, or version. The
 project is early; expect the shape to move.
 
 **Where it sits.** *Workspace Experience.* Pattern capture for agent
-workflows. Related: [agex-cli](/agex-cli/), [culture](/culture/).
+workflows. Related: [agex](/agex/), [culture](/culture/).
 

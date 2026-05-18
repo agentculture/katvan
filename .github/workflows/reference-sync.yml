@@ -34,11 +34,21 @@ jobs:
       - name: Pull reference
         run: katvan pull --all --json | tee /tmp/pull.json
 
+      - name: Clone agex-cli for SKILL.md sync
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          repository: agentculture/agex-cli
+          ref: main
+          path: _agex-cli-src
+
+      - name: Render agex commands from SKILL.md
+        run: python3 scripts/sync_agex_skills.py _agex-cli-src
+
       - name: Open PR if anything changed
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          if [ -z "$(git status --porcelain site/docs)" ]; then
+          if [ -z "$(git status --porcelain site/)" ]; then
             echo "No reference changes."
             exit 0
           fi
@@ -46,7 +56,7 @@ jobs:
           git checkout -b "$BRANCH"
           git config user.name "katvan-bot"
           git config user.email "katvan-bot@users.noreply.github.com"
-          git add site/docs
+          git add site/
           git commit -m "chore(reference): nightly sync $(date -u +%Y-%m-%d)"
           git push origin "$BRANCH"
           gh pr create \

@@ -23,11 +23,18 @@ def register(sub: argparse._SubParsersAction) -> None:
 
 
 def _check_index(site_root: Path, entry: dict) -> str | None:
-    page = site_root / "docs" / entry["id"] / "index.md"
+    site_path = entry.get("site_path")
+    if site_path:
+        rel = site_path.strip("/")
+        page = site_root / rel / "index.md"
+        rel_display = f"site/{rel}/index.md"
+    else:
+        page = site_root / "docs" / entry["id"] / "index.md"
+        rel_display = f"site/docs/{entry['id']}/index.md"
     if not page.is_file():
-        return f"missing site/docs/{entry['id']}/index.md (hand-authored page)"
+        return f"missing {rel_display} (hand-authored page)"
     if not page.read_text().strip():
-        return f"site/docs/{entry['id']}/index.md is empty"
+        return f"{rel_display} is empty"
     return None
 
 
@@ -45,7 +52,11 @@ def _check_readme_link(entry: dict) -> str | None:
     readme = sibling / "README.md"
     if not readme.is_file():
         return None
-    expected = f"https://culture.dev/{entry['id']}/"
+    site_path = entry.get("site_path")
+    if site_path:
+        expected = f"https://culture.dev{site_path}"
+    else:
+        expected = f"https://culture.dev/{entry['id']}/"
     if expected not in readme.read_text():
         return f"warning: {sibling}/README.md missing link to {expected}"
     return None

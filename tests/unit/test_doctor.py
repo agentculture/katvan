@@ -80,6 +80,25 @@ def test_check_index_populated_file_returns_none(tmp_path: Path) -> None:
     assert doctor_mod._check_index(tmp_path, {"id": "alpha"}) is None
 
 
+def test_check_index_site_path_present(tmp_path: Path) -> None:
+    """When ``site_path`` is set, the index is resolved relative to that path."""
+    page = tmp_path / "agex" / "index.md"
+    page.parent.mkdir(parents=True)
+    page.write_text("# Agex\n\nReal content.\n")
+    entry = {"id": "agex-cli", "site_path": "/agex/"}
+    assert doctor_mod._check_index(tmp_path, entry) is None
+
+
+def test_check_index_site_path_missing(tmp_path: Path) -> None:
+    """A missing file at the ``site_path``-derived location must fail."""
+    entry = {"id": "agex-cli", "site_path": "/agex/"}
+    msg = doctor_mod._check_index(tmp_path, entry)
+    assert msg is not None
+    assert "missing site/agex/index.md" in msg
+    # And it must NOT mention the default docs/<id>/ path.
+    assert "site/docs/agex-cli/index.md" not in msg
+
+
 # --- _check_reference ------------------------------------------------------
 
 
@@ -135,6 +154,34 @@ def test_check_readme_link_missing_warns(
     msg = doctor_mod._check_readme_link({"id": "alpha"})
     assert msg is not None
     assert "missing link to https://culture.dev/alpha/" in msg
+
+
+def test_check_readme_link_uses_site_path_when_set(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """When ``site_path`` is set, the expected README URL uses that path."""
+    sib = tmp_path / "agex-cli"
+    sib.mkdir()
+    # README links to the site_path-derived URL — the check should pass.
+    (sib / "README.md").write_text("See https://culture.dev/agex/ for docs.\n")
+    monkeypatch.setattr(doctor_mod.repos, "siblings_root", lambda: tmp_path)
+    entry = {"id": "agex-cli", "site_path": "/agex/"}
+    assert doctor_mod._check_readme_link(entry) is None
+
+
+def test_check_readme_link_site_path_missing_warns(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """If the README only has the default ``/<id>/`` URL but ``site_path`` is set,
+    the warning should reference the ``site_path``-derived URL."""
+    sib = tmp_path / "agex-cli"
+    sib.mkdir()
+    (sib / "README.md").write_text("See https://culture.dev/agex-cli/ for docs.\n")
+    monkeypatch.setattr(doctor_mod.repos, "siblings_root", lambda: tmp_path)
+    entry = {"id": "agex-cli", "site_path": "/agex/"}
+    msg = doctor_mod._check_readme_link(entry)
+    assert msg is not None
+    assert "missing link to https://culture.dev/agex/" in msg
 
 
 # --- _handle: text + json end-to-end ---------------------------------------

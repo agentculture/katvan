@@ -14,6 +14,6 @@ sites: [culture]
 **Repos:**
 
 {% assign repos_in_cat = site.data.agentculture_repos | where: "category", "workspace-experience" %}
-{% for r in repos_in_cat %}
-- **[{{ r.id }}](/{{ r.id }}/)** — {{ r.description }}
+{% for r in repos_in_cat %}{% if r.site_path %}{% assign r_path = r.site_path %}{% else %}{% assign r_path = r.id | prepend: "/" | append: "/" %}{% endif %}
+- **[{{ r.id }}]({{ r_path }})** — {{ r.description }}
 {% endfor %}

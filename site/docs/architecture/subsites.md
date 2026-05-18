@@ -105,6 +105,6 @@ back-links, custom `head_custom.html` tweaks) is project-specific.
 
 ## See also
 
-- [`agex-cli`](/agex-cli/) — the CLI-side sibling pattern for embedding a project.
+- [`agex`](/agex/) — the CLI-side sibling pattern for embedding a project.
 - [`afi-cli`](/afi-cli/) — the second live sub-site; files in this PR are the canonical example.
 - [agentculture/cloudflare](https://github.com/agentculture/cloudflare) — DNS / Pages / redirect-rule configuration for culture.dev and its sub-sites.
