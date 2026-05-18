@@ -10,7 +10,6 @@ sitemap: false
   {%- if page.sitemap == false -%}{%- continue -%}{%- endif -%}
   {%- unless page.url -%}{%- continue -%}{%- endunless -%}
   {%- if page.url contains "/agentirc/" -%}{%- continue -%}{%- endif -%}
-  {%- if page.url contains "/agex/" -%}{%- continue -%}{%- endif -%}
   {%- if page.url contains "/citation-cli/" -%}{%- continue -%}{%- endif -%}
   {%- assign ext = page.url | split: "." | last -%}
   {%- if page.url contains "." and ext != "html" -%}{%- continue -%}{%- endif -%}
