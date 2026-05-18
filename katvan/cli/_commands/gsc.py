@@ -20,6 +20,11 @@ from katvan.gsc.client import build_client, site_url
 from katvan.gsc.inspect import inspect_url
 from katvan.gsc.sitemaps import list_sitemaps
 
+# Note: ``run_doctor`` is imported lazily inside ``_cmd_doctor``. Module-level
+# import here triggers a circular dependency: ``doctor`` imports
+# ``_sitemap_fetch``, which reaches into ``katvan.cli._errors``, which forces
+# ``katvan.cli/__init__.py`` to (re-)run and tries to import this very file.
+
 
 # ----- subcommand handlers -----------------------------------------------------
 
@@ -67,6 +72,43 @@ def _cmd_inspect(args: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_doctor(args: argparse.Namespace) -> int:
+    from katvan.gsc.doctor import run_doctor  # see import-section note
+
+    client = build_client()
+    report = run_doctor(client, site_url=site_url())
+    json_mode = bool(getattr(args, "json", False))
+    if json_mode:
+        emit_result(report, json_mode=True)
+    else:
+        lines = [
+            f"# GSC doctor report: {report['site']}",
+            "",
+            f"Total URLs: {report['summary']['total']}",
+            f"Problems:   {report['summary']['problems']}",
+        ]
+        if report["summary"]["by_class"]:
+            lines.append("")
+            lines.append("## By class")
+            for cls, count in sorted(report["summary"]["by_class"].items()):
+                lines.append(f"- {cls}: {count}")
+        if report["problems"]:
+            lines.append("")
+            lines.append("## Problem URLs")
+            for p in report["problems"]:
+                lines.append(f"- {p['url']}  ({', '.join(p['classes'])})")
+        if report["errors"]:
+            lines.append("")
+            lines.append("## Errors (inspection failed)")
+            for e in report["errors"]:
+                lines.append(f"- {e['url']}  ({e['error']})")
+        emit_result("\n".join(lines), json_mode=False)
+    # Exit non-zero if ANY problems found OR if some URLs failed inspection.
+    has_problems = report["summary"]["problems"] > 0
+    has_errors = report["summary"]["errors"] > 0
+    return 0 if not (has_problems or has_errors) else 1
+
+
 # ----- top-level verb dispatch -------------------------------------------------
 
 def cmd_gsc(args: argparse.Namespace) -> int:
@@ -104,3 +146,11 @@ def register(sub: argparse._SubParsersAction) -> None:
     i.add_argument("url", help="The URL to inspect (must be under the verified property).")
     i.add_argument("--json", action="store_true", help="Emit structured JSON.")
     i.set_defaults(gsc_func=_cmd_inspect)
+
+    # `doctor` subcommand.
+    d = gsub.add_parser(
+        "doctor",
+        help="Audit every sitemap URL; exit 1 if any problems are found.",
+    )
+    d.add_argument("--json", action="store_true", help="Emit structured JSON.")
+    d.set_defaults(gsc_func=_cmd_doctor)

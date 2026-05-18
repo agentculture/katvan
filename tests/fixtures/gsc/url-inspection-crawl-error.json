@@ -1,0 +1,13 @@
+{
+  "inspectionResult": {
+    "indexStatusResult": {
+      "verdict": "FAIL",
+      "coverageState": "Crawl error",
+      "lastCrawlTime": "2026-05-12T03:11:00Z",
+      "robotsTxtState": "ALLOWED",
+      "pageFetchState": "SERVER_ERROR",
+      "googleCanonical": "",
+      "userCanonical": "https://culture.dev/broken/"
+    }
+  }
+}
