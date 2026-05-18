@@ -123,3 +123,23 @@ def test_render_skips_directories_without_skill_md(tmp_path: Path):
 def test_main_rejects_wrong_argv():
     assert sync.main(["sync_agex_skills.py"]) == 2
     assert sync.main(["sync_agex_skills.py", "a", "b"]) == 2
+
+
+def test_render_uses_directory_slug_for_permalink_when_name_differs(tmp_path: Path):
+    """If a SKILL.md's `name:` frontmatter diverges from its directory slug,
+    the page's permalink and output filename use the directory slug
+    (so URLs and file paths can't drift)."""
+    src = tmp_path / "agex-src"
+    out = tmp_path / "out"
+    _write_skill(src / "src/agent_experience/commands/pr/SKILL.md", "pr-renamed", "# body")
+
+    sync.render(src, out)
+
+    # Filename is the directory slug, not the frontmatter name.
+    assert (out / "pr.md").exists()
+    assert not (out / "pr-renamed.md").exists()
+    # Permalink uses the directory slug.
+    page = (out / "pr.md").read_text()
+    assert "permalink: /agex/commands/pr/\n" in page
+    # Title uses the parsed name from frontmatter (it's the human label).
+    assert "title: pr-renamed\n" in page

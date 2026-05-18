@@ -2,7 +2,7 @@
 """sync_agex_skills.py — render agex-cli SKILL.md files into katvan site pages.
 
 Usage:
-    python3 scripts/sync_agex_skills.py <path-to-agex-cli-checkout> [--out <dir>]
+    python3 scripts/sync_agex_skills.py <path-to-agex-cli-checkout>
 
 Reads ``<agex-cli>/src/agent_experience/commands/*/SKILL.md``, strips each
 SKILL.md's own YAML frontmatter, prepends a Jekyll-friendly frontmatter
@@ -109,11 +109,12 @@ def render(agex_root: Path, out_dir: Path = DEFAULT_OUT_DIR) -> int:
     expected = {f"{p.parent.name}.md" for p in skills} | {"index.md"}
     _clear_stale_pages(out_dir, expected)
     for order, skill_md in enumerate(skills, start=1):
-        name, body = parse_skill_md(skill_md.read_text(encoding="utf-8"))
+        slug = skill_md.parent.name
+        title, body = parse_skill_md(skill_md.read_text(encoding="utf-8"))
         page = _JEKYLL_FRONTMATTER.format(
-            title=name, order=order * 10, name=name
+            title=title, order=order * 10, name=slug
         ) + body
-        (out_dir / f"{skill_md.parent.name}.md").write_text(page, encoding="utf-8")
+        (out_dir / f"{slug}.md").write_text(page, encoding="utf-8")
     (out_dir / "index.md").write_text(_INDEX_PAGE, encoding="utf-8")
     return 0
 
