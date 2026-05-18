@@ -6,7 +6,12 @@
 
 `agentculture/agex-cli` ships a small Jekyll docs site that publishes to `culture.dev/agex/` from its own `docs/` folder via a standalone Cloudflare Pages project (`agex.pages.dev`) routed under `culture.dev`. Issue [#13](https://github.com/agentculture/katvan/issues/13) asked katvan to absorb that site so culture.dev is served end-to-end from a single source.
 
-The absorption advances the **operating model** for culture.dev: katvan is the technical writer / marketing-site owner for the AgentCulture mesh. Sibling repos (cultureagent, agentirc, daria, steward, …) make code and product changes; they (or their PMs / agents) file issues on katvan describing what the public site should say. katvan iterates the site. Sibling repos do *not* run their own Jekyll deploys.
+The absorption advances the **operating model** for culture.dev. The repo name comes from Hebrew *katvan* — "writer / scribe". katvan owns the customer-facing site for the AgentCulture mesh:
+
+- **Sibling repos and their PMs / agents** know *what* changed in their product: the new verb, the shipped feature, the API rename, the deprecation. They file issues against katvan describing the substance.
+- **katvan** knows *how* that change should sit on a public site: where it goes in the IA, how the framing reads, what links in, what gets retired. katvan iterates `culture.dev`.
+
+Sibling repos do not run their own Jekyll deploys. They write the substance; katvan writes the page. This split is what makes a unified marketing/docs surface possible without each product team needing to think about navigation or voice.
 
 ## Goal
 
