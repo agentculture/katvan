@@ -1,6 +1,6 @@
 ---
 title: steward
-parent: Resident Culture
+parent: "Resident Agents"
 nav_order: 6
 permalink: /steward/
 sites: [culture]
@@ -17,6 +17,8 @@ stale within a week. `steward` is the source of truth: skills are
 authored there, vendored out to siblings, and re-pulled when steward
 cuts a new version. The repo also owns registry hygiene as a remit.
 
-**Where it sits.** *Resident Culture.* The skill source-of-truth.
+**Where it sits.** *Resident Agents.* The skill source-of-truth.
 Related: [katvan](/katvan/), [agtag](/agtag/).
+
+**How to reach it.** Reached through the skills it vends — `cicd`, `communicate`, and the rest — installed into sibling repos.
 

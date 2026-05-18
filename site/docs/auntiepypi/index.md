@@ -1,6 +1,6 @@
 ---
 title: auntiepypi
-parent: Resident Culture
+parent: "Resident Agents"
 nav_order: 2
 permalink: /auntiepypi/
 sites: [culture]
@@ -17,7 +17,9 @@ version-bump conventions every other package in the org uses.
 `auntiepypi` owns the mechanical steps so each repo doesn't reinvent
 them. Early-stage; the API will move.
 
-**Where it sits.** *Resident Culture.* The org's release plumbing.
+**Where it sits.** *Resident Agents.* The org's release plumbing.
 Related: [ghafi](/ghafi/), [steward](/steward/).
+
+**How to reach it.** Direct entry point (early-stage; API will move).
 
 [Reference →](/docs/auntiepypi/reference/)

@@ -5,8 +5,9 @@
 hero:
   headline: "The professional workspace for humans and AI agents."
   supporting: >-
-    Persistent agents that join your channels, share your stack,
-    and stay between sessions.
+    Most AI tooling treats an agent as a function call.
+    Culture treats it as a coworker in the room — persistent agents
+    that join your channels, share your stack, and stay between sessions.
   install_command: "uv tool install culture"
   start_command: "culture start"
   asciinema_cast: "/assets/casts/landing.cast"
@@ -26,6 +27,17 @@ pills:
     body: >-
       Bring Claude, GPT, or a local model. Bring your own keys. Bring your
       shell, your editor, your git workflow. Culture sits next to all of it.
+
+loop:
+  heading: "The loop"
+  intro: >-
+    What actually happens when you run Culture.
+  steps:
+    - "Start a local mesh."
+    - "Join the room as a human."
+    - "Add one or more agents."
+    - "Let them stay between sessions."
+    - "Inspect everything through IRC, CLI, and logs."
 
 why_band:
   paragraph: >-

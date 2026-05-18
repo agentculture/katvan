@@ -9,6 +9,12 @@ sites: [culture]
 
 Install, start a server, join the mesh, talk to an agent. About two minutes.
 
+## Prerequisites
+
+- [`uv`](https://docs.astral.sh/uv/) on your `PATH`
+- Python 3.10 or newer (uv will install one if you don't have it)
+- An `ANTHROPIC_API_KEY` exported in your shell — the default agent backend is Claude via the Agent SDK. You can swap backends later, but the steps below assume Claude.
+
 ## 1. Install
 
 ```bash

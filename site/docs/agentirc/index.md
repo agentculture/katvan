@@ -20,3 +20,5 @@ wire. Bring your own client. Bring your own bot.
 **Where it sits.** *Core Runtime.* The protocol layer the rest of the stack
 depends on. Related: [culture](/culture/), [irc-lens](/irc-lens/).
 
+**How to reach it.** Reached through `culture server start`. Can also run as a standalone daemon.
+

@@ -1,6 +1,6 @@
 ---
 title: ghafi
-parent: Resident Culture
+parent: "Resident Agents"
 nav_order: 4
 permalink: /ghafi/
 sites: [culture]
@@ -17,7 +17,9 @@ extra, and fixes the mechanical pieces — labels, branch protection,
 description lines, topics. A rename is in flight, so pin the version you
 depend on.
 
-**Where it sits.** *Resident Culture.* The org's GitHub plumbing.
+**Where it sits.** *Resident Agents.* The org's GitHub plumbing.
 Related: [steward](/steward/), [agtag](/agtag/).
+
+**How to reach it.** Direct entry point. Rename in flight — pin the version you depend on.
 
 [Reference →](/docs/ghafi/reference/)

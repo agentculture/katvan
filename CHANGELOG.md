@@ -9,6 +9,27 @@ artifacts.
 
 ## [Unreleased]
 
+## [0.3.1] — 2026-05-18
+
+### Changed
+
+- Site front door (`site/`): hero now leads with the "function call vs
+  coworker" framing; new "The Loop" homepage section between the
+  capability pills and the ecosystem grid; Quickstart has an explicit
+  Prerequisites block (uv, Python, `ANTHROPIC_API_KEY`); each component
+  page gains a "How to reach it" line distinguishing direct CLIs from
+  tools accessed through `culture` or vended skills (#34).
+- Ecosystem category headings now read correctly ("Identity & Secrets",
+  "Resident Agents", etc.) via a new `_data/category_titles.yml` lookup;
+  prior `capitalize` filter only touched the first letter and produced
+  "Identity secrets" / "Resident culture" in the rendered preview.
+- "Resident Culture" category renamed to **Resident Agents** for outsider
+  legibility; URL slug `/categories/resident-culture/` unchanged.
+- `agex` demoted from sidebar peer to a nested child under
+  `Workspace Experience`; "Agent Experience" removed from the top
+  navigation. Agex enters the site through the Ecosystem like every
+  other tool.
+
 ## [0.3.0] — 2026-05-18
 
 ### Added

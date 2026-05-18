@@ -21,3 +21,5 @@ call. Early-stage; rate limits and policy are your responsibility.
 Telegram-community domain. Related: [office-agent](/office-agent/),
 [appsec](/appsec/).
 
+**How to reach it.** Reached as a resident agent — start it from `culture`.
+

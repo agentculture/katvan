@@ -1,6 +1,6 @@
 ---
 title: katvan
-parent: Resident Culture
+parent: "Resident Agents"
 nav_order: 5
 permalink: /katvan/
 sites: [culture]
@@ -18,7 +18,9 @@ syncs reference content via the sibling's AFI binary, and `katvan
 doctor` fails CI when a registered repo is missing its page. Runs as a
 CLI; also drives the docs-check workflow.
 
-**Where it sits.** *Resident Culture.* The site's resident docs agent.
+**Where it sits.** *Resident Agents.* The site's resident docs agent.
 Related: [steward](/steward/), [cultureflare](/cultureflare/).
+
+**How to reach it.** Direct entry point; also drives the `docs-check` CI workflow.
 
 [Reference →](/docs/katvan/reference/)

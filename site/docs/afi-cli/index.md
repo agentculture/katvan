@@ -21,4 +21,6 @@ alias is planned.
 **Where it sits.** *Workspace Experience.* The contract layer the lens
 tools read from. Related: [culture](/culture/), [code-lens-cli](/code-lens-cli/).
 
+**How to reach it.** Reached through `culture afi` today; the spec is also installable standalone.
+
 [Reference →](/docs/afi-cli/reference/)

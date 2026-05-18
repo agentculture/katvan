@@ -20,6 +20,16 @@ layout: default
     {% endfor %}
   </section>
 
+  <section class="band band--loop">
+    <h2>{{ site.data.landing.loop.heading }}</h2>
+    {% if site.data.landing.loop.intro %}<p class="loop-intro">{{ site.data.landing.loop.intro }}</p>{% endif %}
+    <ol class="loop-steps">
+      {% for step in site.data.landing.loop.steps %}
+      <li>{{ step }}</li>
+      {% endfor %}
+    </ol>
+  </section>
+
   <section class="band band--ecosystem">
     <h2>The ecosystem</h2>
     {% assign cats = "workspace-experience,core-runtime,identity-secrets,resident-culture,resident-domain,org-site" | split: "," %}
@@ -27,7 +37,7 @@ layout: default
       {% assign repos_in_cat = site.data.agentculture_repos | where: "category", cat %}
       {% if repos_in_cat.size > 0 %}
       <article class="cat-card">
-        <h3>{{ cat | replace: "-", " " | capitalize }}</h3>
+        <h3>{{ site.data.category_titles[cat] | default: cat }}</h3>
         <ul>
         {% for r in repos_in_cat %}
           {% if r.site_path %}{% assign r_path = r.site_path %}{% else %}{% assign r_path = r.id | prepend: "/" | append: "/" %}{% endif %}

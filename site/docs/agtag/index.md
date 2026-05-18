@@ -1,6 +1,6 @@
 ---
 title: agtag
-parent: Resident Culture
+parent: "Resident Agents"
 nav_order: 1
 permalink: /agtag/
 sites: [culture]
@@ -17,7 +17,9 @@ on the target repo, polls for replies, and gives both sides a stable
 thread to work from. The same binary backs the cross-repo verbs in the
 `communicate` skill.
 
-**Where it sits.** *Resident Culture.* The mesh's cross-repo message bus.
+**Where it sits.** *Resident Agents.* The mesh's cross-repo message bus.
 Related: [steward](/steward/), [ghafi](/ghafi/).
+
+**How to reach it.** Direct entry point, and the engine behind the `communicate` skill that ships in sibling repos.
 
 [Reference →](/docs/agtag/reference/)

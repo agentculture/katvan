@@ -12,7 +12,7 @@ sites: [culture]
 {% assign repos_in_cat = site.data.agentculture_repos | where: "category", cat %}
 {% if repos_in_cat.size > 0 %}
 
-## {{ cat | replace: "-", " " | capitalize }}
+## {{ site.data.category_titles[cat] | default: cat }}
 
 [Read the category overview →](/categories/{{ cat }}/)
 
