@@ -12,10 +12,15 @@ Handles two shapes:
 """
 from __future__ import annotations
 
-import xml.etree.ElementTree as ET
 from dataclasses import dataclass
+from typing import TYPE_CHECKING
 from urllib.error import URLError
 from urllib.request import Request, urlopen
+
+from defusedxml import ElementTree as ET
+
+if TYPE_CHECKING:
+    from xml.etree.ElementTree import Element  # nosec B405 - typing only; runtime parsing uses defusedxml
 
 from katvan.cli._errors import EXIT_ENV_ERROR, KatvanError
 
@@ -37,12 +42,37 @@ class _Response:
 def _http_get(url: str) -> _Response:
     """Single seam patched in tests."""
     req = Request(url, headers={"User-Agent": _USER_AGENT})
-    with urlopen(req, timeout=_TIMEOUT_SECONDS) as resp:  # noqa: S310 - https only, see caller
+    with urlopen(req, timeout=_TIMEOUT_SECONDS) as resp:  # nosec B310 - scheme guarded in fetch_sitemap_urls
         return _Response(content=resp.read(), status_code=resp.status)
 
 
-def _parse_locs(body: bytes, tag: str) -> list[str]:
-    root = ET.fromstring(body)
+def _fetch_or_raise(url: str) -> bytes:
+    """Fetch URL with KatvanError translation on any failure."""
+    try:
+        resp = _http_get(url)
+        resp.raise_for_status()
+    except Exception as exc:  # noqa: BLE001 - normalise to KatvanError
+        raise KatvanError(
+            code=EXIT_ENV_ERROR,
+            message=f"failed to fetch {url}: {exc}",
+            remediation="check the URL is reachable",
+        ) from exc
+    return resp.content
+
+
+def _fetch_and_parse(url: str) -> Element:
+    body = _fetch_or_raise(url)
+    try:
+        return ET.fromstring(body)
+    except ET.ParseError as exc:
+        raise KatvanError(
+            code=EXIT_ENV_ERROR,
+            message=f"failed to parse sitemap XML from {url}: {exc}",
+            remediation="check the URL serves a well-formed sitemap",
+        ) from exc
+
+
+def _parse_locs(root: Element, tag: str) -> list[str]:
     return [
         node.text.strip()
         for node in root.findall(f"{SITEMAP_NS}{tag}/{SITEMAP_NS}loc")
@@ -58,28 +88,24 @@ def fetch_sitemap_urls(site_url: str) -> list[str]:
     """
     base = site_url.rstrip("/")
     top = f"{base}/sitemap.xml"
-    try:
-        resp = _http_get(top)
-        resp.raise_for_status()
-    except Exception as exc:  # noqa: BLE001 - normalise to KatvanError
+    if not top.startswith(("http://", "https://")):
         raise KatvanError(
             code=EXIT_ENV_ERROR,
-            message=f"failed to fetch {top}: {exc}",
-            remediation="check the site is reachable and the URL is correct",
-        ) from exc
+            message=f"site URL must use http or https: {top}",
+            remediation="set KATVAN_GSC_SITE to a valid http(s) URL",
+        )
 
-    root = ET.fromstring(resp.content)
+    root = _fetch_and_parse(top)
     local = root.tag[len(SITEMAP_NS):] if root.tag.startswith(SITEMAP_NS) else root.tag
 
     if local == "urlset":
-        return _parse_locs(resp.content, "url")
+        return _parse_locs(root, "url")
 
     if local == "sitemapindex":
         child_urls: list[str] = []
-        for child in _parse_locs(resp.content, "sitemap"):
-            child_resp = _http_get(child)
-            child_resp.raise_for_status()
-            child_urls.extend(_parse_locs(child_resp.content, "url"))
+        for child in _parse_locs(root, "sitemap"):
+            child_root = _fetch_and_parse(child)
+            child_urls.extend(_parse_locs(child_root, "url"))
         return child_urls
 
     raise KatvanError(

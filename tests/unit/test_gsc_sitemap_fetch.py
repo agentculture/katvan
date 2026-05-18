@@ -6,7 +6,7 @@ from unittest.mock import patch
 
 import pytest
 
-from katvan.cli._errors import KatvanError
+from katvan.cli._errors import EXIT_ENV_ERROR, KatvanError
 from katvan.gsc._sitemap_fetch import fetch_sitemap_urls
 
 FIX = Path(__file__).resolve().parent.parent / "fixtures" / "gsc"
@@ -83,3 +83,35 @@ def test_strips_trailing_slash_when_building_url() -> None:
     with patch("katvan.gsc._sitemap_fetch._http_get", side_effect=fake_get):
         fetch_sitemap_urls("https://culture.dev/")
     assert captured == ["https://culture.dev/sitemap.xml"]
+
+
+def test_non_http_scheme_rejected() -> None:
+    with pytest.raises(KatvanError) as exc:
+        fetch_sitemap_urls("file:///etc/")
+    assert exc.value.code == EXIT_ENV_ERROR
+    assert "http" in exc.value.message
+
+
+def test_child_sitemap_fetch_failure_raises_katvan_error() -> None:
+    def fake_get(url: str) -> _FakeResponse:
+        if url.endswith("sitemap.xml"):
+            return _FakeResponse(_index_bytes())
+        # child sitemap returns 503
+        return _FakeResponse(b"", status=503)
+
+    with patch("katvan.gsc._sitemap_fetch._http_get", side_effect=fake_get):
+        with pytest.raises(KatvanError) as exc:
+            fetch_sitemap_urls("https://culture.dev/")
+    assert exc.value.code == EXIT_ENV_ERROR
+    assert "sitemap-leaf-a.xml" in exc.value.message or "leaf" in exc.value.message
+
+
+def test_malformed_xml_raises_katvan_error() -> None:
+    def fake_get(url: str) -> _FakeResponse:
+        return _FakeResponse(b"this is not xml <<< at all")
+
+    with patch("katvan.gsc._sitemap_fetch._http_get", side_effect=fake_get):
+        with pytest.raises(KatvanError) as exc:
+            fetch_sitemap_urls("https://culture.dev/")
+    assert exc.value.code == EXIT_ENV_ERROR
+    assert "parse" in exc.value.message.lower()
