@@ -9,6 +9,27 @@ artifacts.
 
 ## [Unreleased]
 
+## [0.2.7] — 2026-05-18
+
+### Changed
+
+- `site/_data/agentculture_repos.yml`: schema header documents the
+  optional `package:` override for siblings whose PyPI name diverges
+  from their repo id (the field was already in use for agentirc but
+  undocumented), and adds the missing third `docs_mode: pull` value
+  that the librarian skill supports.
+- `.github/workflows/reference-sync.yml`: the install loop now reads
+  `package or id` per pull-reference entry, so a future flip of a
+  diverging-name sibling (antoine → antoine-cli is queued in this
+  PR) installs cleanly without further workflow edits.
+
+### Added
+
+- `site/_data/agentculture_repos.yml`: `antoine` entry gains
+  `binary: antoine` and `package: antoine-cli`. Still `docs_mode:
+  skip` for now; flip to `pull-reference` is a separate one-line PR
+  once this one lands.
+
 ## [0.2.6] — 2026-05-18
 
 ### Fixed

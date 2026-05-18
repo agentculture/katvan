@@ -1,6 +1,6 @@
 [project]
 name = "katvan"
-version = "0.2.6"
+version = "0.2.7"
 description = "Maintain sibling-repo docs under one roof on the culture.dev site."
 readme = "README.md"
 license = "MIT"

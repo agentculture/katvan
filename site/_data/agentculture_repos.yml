@@ -11,13 +11,21 @@
 #                                   and writes site/docs/<id>/reference/.
 #                                   Pick this when the sibling ships an
 #                                   AFI-compatible CLI binary.
+#                  pull           — librarian pull syncs the sibling's
+#                                   narrative docs/ directory into
+#                                   site/docs/<id>/. Pick this when the
+#                                   sibling ships authored markdown but
+#                                   no AFI binary.
 #                  skip           — no automated sync. The per-repo page on
 #                                   culture.dev is hand-authored end to end.
 #                                   Pick this for daemons, services, or
 #                                   repos without an AFI binary.
 #   description  (required) one short sentence (<=140 chars) — what it is,
 #                  not what it will be
-#   package      (optional) PyPI package name if applicable
+#   package      (optional) PyPI package name. Set this only when the
+#                  package name diverges from the repo id (e.g. agentirc
+#                  → agentirc-cli). The reference-sync workflow installs
+#                  `package` if set, else falls back to `id`.
 #   binary       (optional) CLI binary name if applicable
 #   docs         (optional) absolute URL — culture.dev page or repo README
 #   site_path    (optional) the canonical katvan-site path for this repo,
@@ -101,6 +109,8 @@
   maturity: experimental
   docs_mode: skip
   description: Turns N tool-call sequences into one reusable Kata.
+  binary: antoine
+  package: antoine-cli
 
 - id: code-lens-cli
   category: workspace-experience
