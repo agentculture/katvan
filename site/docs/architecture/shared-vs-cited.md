@@ -12,7 +12,7 @@ permalink: /architecture/shared-vs-cited/
 **Status (culture 11.0.0, 2026-05-11):** This rule is now historical for
 culture's own tree. The agent harness moved to the sibling
 [`cultureagent`](https://github.com/agentculture/cultureagent) package in
-Phase 1 of the [extraction](https://github.com/agentculture/culture/blob/main/docs/superpowers/specs/2026-05-09-cultureagent-extraction-design.md);
+Phase 1 of the [extraction](https://github.com/agentculture/culture/blob/4595fc7/docs/superpowers/specs/2026-05-09-cultureagent-extraction-design.md);
 culture's `culture/clients/<backend>/{config,constants}.py` and
 `culture/clients/shared/*.py` are re-export shims forwarding to
 `cultureagent.clients.<backend>.*` / `cultureagent.clients.shared.*`,
