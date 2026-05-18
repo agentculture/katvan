@@ -9,6 +9,31 @@ artifacts.
 
 ## [Unreleased]
 
+## [0.2.5] — 2026-05-18
+
+### Added
+
+- Site: absorbed `agex-cli`'s standalone Jekyll docs site into
+  katvan. `culture.dev/agex/` is now served from katvan's main
+  build as plain paths inside the same site — no separate
+  `_config.agex.yml`, no separate Cloudflare project, no path-
+  routing rule. Prose pages (`/agex/`, `/agex/getting-started/`,
+  `/agex/skill-sources/`) are hand-imported; per-command pages
+  under `/agex/commands/<verb>/` are rendered from
+  `agex-cli/src/agent_experience/commands/*/SKILL.md` by
+  `scripts/sync_agex_skills.py`, refreshed by the nightly
+  `reference-sync.yml` cron.
+- `scripts/sync_agex_skills.py` + `tests/unit/test_sync_agex_skills.py`
+  (11 tests, stdlib-only renderer).
+- `tests/conftest.py` adds `scripts/` to `sys.path` so non-package
+  script modules are importable from unit tests.
+
+### Removed
+
+- `site/docs/agex-cli/index.md` (the marketing-rebuild placeholder
+  overview); inbound internal links repointed to `/agex/`. No
+  redirect — this is a renovation, not a migration.
+
 ## [0.2.4] — 2026-05-18
 
 ### Fixed
