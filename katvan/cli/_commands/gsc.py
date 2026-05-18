@@ -17,6 +17,7 @@ import argparse
 from katvan.cli._errors import EXIT_USER_ERROR, KatvanError
 from katvan.cli._output import emit_result
 from katvan.gsc.client import build_client, site_url
+from katvan.gsc.inspect import inspect_url
 from katvan.gsc.sitemaps import list_sitemaps
 
 
@@ -40,6 +41,29 @@ def _cmd_sitemaps(args: argparse.Namespace) -> int:
                     f"errors={row['errors']}\twarnings={row['warnings']}"
                 )
             emit_result("\n".join(lines), json_mode=False)
+    return 0
+
+
+def _cmd_inspect(args: argparse.Namespace) -> int:
+    client = build_client()
+    result = inspect_url(client, url=args.url, site_url=site_url())
+    json_mode = bool(getattr(args, "json", False))
+    if json_mode:
+        emit_result(result, json_mode=True)
+    else:
+        lines = [
+            f"url: {result['url']}",
+            f"verdict: {result['verdict']}",
+            f"coverage_state: {result['coverage_state']}",
+            f"last_crawl_time: {result['last_crawl_time'] or '-'}",
+            f"robots_txt_state: {result['robots_txt_state']}",
+            f"page_fetch_state: {result['page_fetch_state']}",
+            f"google_canonical: {result['google_canonical'] or '-'}",
+            f"user_canonical: {result['user_canonical'] or '-'}",
+            f"mobile_usability: {result['mobile_usability'] or '-'}",
+            f"rich_results: {result['rich_results'] or '-'}",
+        ]
+        emit_result("\n".join(lines), json_mode=False)
     return 0
 
 
@@ -74,3 +98,9 @@ def register(sub: argparse._SubParsersAction) -> None:
     s = gsub.add_parser("sitemaps", help="List submitted sitemaps and status.")
     s.add_argument("--json", action="store_true", help="Emit structured JSON.")
     s.set_defaults(gsc_func=_cmd_sitemaps)
+
+    # `inspect` subcommand.
+    i = gsub.add_parser("inspect", help="Inspect a single URL's indexing status.")
+    i.add_argument("url", help="The URL to inspect (must be under the verified property).")
+    i.add_argument("--json", action="store_true", help="Emit structured JSON.")
+    i.set_defaults(gsc_func=_cmd_inspect)

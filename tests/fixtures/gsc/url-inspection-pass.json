@@ -1,0 +1,15 @@
+{
+  "inspectionResult": {
+    "indexStatusResult": {
+      "verdict": "PASS",
+      "coverageState": "Submitted and indexed",
+      "lastCrawlTime": "2026-05-15T10:00:00Z",
+      "robotsTxtState": "ALLOWED",
+      "pageFetchState": "SUCCESSFUL",
+      "googleCanonical": "https://culture.dev/",
+      "userCanonical": "https://culture.dev/"
+    },
+    "mobileUsabilityResult": {"verdict": "PASS"},
+    "richResultsResult": {"verdict": "PASS"}
+  }
+}
