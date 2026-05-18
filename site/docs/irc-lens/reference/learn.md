@@ -50,6 +50,6 @@ sites: [culture]
   "json_support": true,
   "purpose": "Reactive web console for AgentIRC. Server-rendered HTMX + SSE frontend so a Playwright-driven agent can administer any AgentIRC server. Pure client; no agent loop.",
   "tool": "irc-lens",
-  "version": "0.4.2"
+  "version": "0.5.3"
 }
 ```
