@@ -184,7 +184,7 @@ def repos() -> Iterator[tuple[str, str, str]]:
 # and the overview verb does not need them.
 _SCALAR_FIELDS: tuple[str, ...] = (
     "category", "maturity", "docs_mode", "description",
-    "package", "binary", "docs", "install", "caveat",
+    "package", "binary", "docs", "site_path", "install", "caveat",
 )
 
 

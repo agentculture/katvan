@@ -248,6 +248,7 @@ def test_entries_returns_all_scalar_fields(
         "  package: fully-pkg\n"
         "  binary: fully-bin\n"
         "  docs: https://example.test/docs\n"
+        "  site_path: /fully/\n"
         "  install: pip install fully-pkg\n"
         "  caveat: handle with care\n"
     )
@@ -257,12 +258,13 @@ def test_entries_returns_all_scalar_fields(
     entry = out[0]
     for key in (
         "id", "category", "maturity", "docs_mode", "description",
-        "package", "binary", "docs", "install", "caveat",
+        "package", "binary", "docs", "site_path", "install", "caveat",
     ):
         assert key in entry, f"missing field: {key}"
     assert entry["id"] == "fully"
     assert entry["category"] == "workspace-experience"
     assert entry["caveat"] == "handle with care"
+    assert entry["site_path"] == "/fully/"
 
 
 def test_entries_skips_list_valued_fields_without_brackets_in_value(
