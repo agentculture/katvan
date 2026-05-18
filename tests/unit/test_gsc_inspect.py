@@ -57,6 +57,17 @@ def test_inspect_url_rejects_url_outside_site() -> None:
     client.urlInspection.assert_not_called()
 
 
+def test_inspect_url_rejects_substring_host_confusion() -> None:
+    client = MagicMock()
+    with pytest.raises(KatvanError):
+        # culture.dev/ as the site, evil host that starts with culture.dev
+        inspect_url(
+            client,
+            url="https://culture.dev.evil.com/x",
+            site_url="https://culture.dev/",
+        )
+
+
 def test_inspect_url_passes_correct_args_to_api() -> None:
     payload = json.loads((FIX / "url-inspection-pass.json").read_text())
     client = _fake_client(payload)

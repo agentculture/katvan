@@ -28,8 +28,14 @@ _SETUP_HINT = "see docs/gsc-setup.md for the one-time setup steps"
 
 
 def site_url() -> str:
-    """Return the verified-property URL (env override or default)."""
-    return os.environ.get("KATVAN_GSC_SITE", DEFAULT_SITE_URL)
+    """Return the verified-property URL (env override or default).
+
+    Always normalised to a trailing slash so consumers can do prefix
+    matching without worrying about substring host confusion
+    (e.g. ``https://culture.dev`` accepting ``https://culture.dev.evil.com/``).
+    """
+    raw = os.environ.get("KATVAN_GSC_SITE", DEFAULT_SITE_URL)
+    return raw if raw.endswith("/") else raw + "/"
 
 
 def build_client() -> Any:

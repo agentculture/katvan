@@ -33,6 +33,18 @@ def test_site_url_falls_back_to_default(monkeypatch: pytest.MonkeyPatch) -> None
     assert site_url() == DEFAULT_SITE_URL
 
 
+def test_site_url_normalises_missing_trailing_slash(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("KATVAN_GSC_SITE", "https://culture.dev")
+    assert site_url() == "https://culture.dev/"
+
+
+def test_site_url_does_not_double_slash(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("KATVAN_GSC_SITE", "https://culture.dev/")
+    assert site_url() == "https://culture.dev/"
+
+
 def test_build_client_raises_when_credentials_env_unset(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
