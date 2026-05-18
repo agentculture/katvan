@@ -348,18 +348,19 @@
 }
 
 // Landing-page bands. Marketing-shaped overrides on top of just-the-docs.
-body.home main { max-width: 64rem; margin: 0 auto; padding: 2rem 1.5rem; }
-body.home .band { padding: 3rem 0; border-bottom: 1px solid var(--border-color, #2a2a2a); }
-body.home .band--hero h1 { font-size: 2.5rem; line-height: 1.15; margin: 0 0 1rem; }
-body.home .band--hero .supporting { font-size: 1.15rem; opacity: 0.85; margin: 0 0 1.5rem; }
-body.home .band--hero pre.install { background: #111; padding: 1rem; border-radius: 6px; margin: 0.5rem 0; }
-body.home .band--hero .cta { display: inline-block; margin-top: 1.5rem; font-weight: 600; }
-body.home .band--pills { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; }
-body.home .band--pills .pill h2 { font-size: 1.15rem; margin: 0 0 0.5rem; }
-body.home .band--ecosystem h2 { margin: 0 0 2rem; }
-body.home .band--ecosystem .cat-card { margin: 0 0 2rem; }
-body.home .band--ecosystem .cat-card h3 { font-size: 1rem; text-transform: uppercase; letter-spacing: 0.05em; opacity: 0.7; margin: 0 0 0.5rem; }
-body.home .band--ecosystem .cat-card ul { list-style: none; padding: 0; }
-body.home .band--ecosystem .cat-card li { padding: 0.25rem 0; }
-body.home .band--why .cta { font-weight: 600; }
-@media (max-width: 720px) { body.home .band--pills { grid-template-columns: 1fr; } }
+// Hosted inside just-the-docs default layout, so .main / .main-content
+// already handle width and sidebar offset — only the band styling lives here.
+.home-content .band { padding: 3rem 0; border-bottom: 1px solid var(--border-color, #2a2a2a); }
+.home-content .band--hero h1 { font-size: 2.5rem; line-height: 1.15; margin: 0 0 1rem; }
+.home-content .band--hero .supporting { font-size: 1.15rem; opacity: 0.85; margin: 0 0 1.5rem; }
+.home-content .band--hero pre.install { background: #111; padding: 1rem; border-radius: 6px; margin: 0.5rem 0; }
+.home-content .band--hero .cta { display: inline-block; margin-top: 1.5rem; font-weight: 600; }
+.home-content .band--pills { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; }
+.home-content .band--pills .pill h2 { font-size: 1.15rem; margin: 0 0 0.5rem; }
+.home-content .band--ecosystem h2 { margin: 0 0 2rem; }
+.home-content .band--ecosystem .cat-card { margin: 0 0 2rem; }
+.home-content .band--ecosystem .cat-card h3 { font-size: 1rem; text-transform: uppercase; letter-spacing: 0.05em; opacity: 0.7; margin: 0 0 0.5rem; }
+.home-content .band--ecosystem .cat-card ul { list-style: none; padding: 0; }
+.home-content .band--ecosystem .cat-card li { padding: 0.25rem 0; }
+.home-content .band--why .cta { font-weight: 600; }
+@media (max-width: 720px) { .home-content .band--pills { grid-template-columns: 1fr; } }

@@ -1,51 +1,45 @@
-<!doctype html>
-<html lang="{{ site.lang | default: 'en' }}">
-<head>
-  {% include head.html %}
-  <link rel="stylesheet" href="{{ '/assets/css/just-the-docs-default.css' | relative_url }}">
-</head>
-<body class="home">
-  <main>
-    <section class="band band--hero">
-      <h1>{{ site.data.landing.hero.headline }}</h1>
-      <p class="supporting">{{ site.data.landing.hero.supporting }}</p>
-      <pre class="install"><code>{{ site.data.landing.hero.install_command }}</code></pre>
-      <pre class="install"><code>{{ site.data.landing.hero.start_command }}</code></pre>
-      <a class="cta" href="/quickstart/">Quickstart →</a>
-    </section>
+---
+layout: default
+---
+<div class="home-content">
+  <section class="band band--hero">
+    <h1>{{ site.data.landing.hero.headline }}</h1>
+    <p class="supporting">{{ site.data.landing.hero.supporting }}</p>
+    <pre class="install"><code>{{ site.data.landing.hero.install_command }}</code></pre>
+    <pre class="install"><code>{{ site.data.landing.hero.start_command }}</code></pre>
+    <a class="cta" href="/quickstart/">Quickstart →</a>
+  </section>
 
-    <section class="band band--pills">
-      {% for pill in site.data.landing.pills %}
-      <article class="pill">
-        <h2>{{ pill.title }}</h2>
-        <p>{{ pill.body }}</p>
-        <a href="{{ pill.href }}">Learn more →</a>
+  <section class="band band--pills">
+    {% for pill in site.data.landing.pills %}
+    <article class="pill">
+      <h2>{{ pill.title }}</h2>
+      <p>{{ pill.body }}</p>
+      <a href="{{ pill.href }}">Learn more →</a>
+    </article>
+    {% endfor %}
+  </section>
+
+  <section class="band band--ecosystem">
+    <h2>The ecosystem</h2>
+    {% assign cats = "workspace-experience,core-runtime,identity-secrets,resident-culture,resident-domain,org-site" | split: "," %}
+    {% for cat in cats %}
+      {% assign repos_in_cat = site.data.agentculture_repos | where: "category", cat %}
+      {% if repos_in_cat.size > 0 %}
+      <article class="cat-card">
+        <h3>{{ cat | replace: "-", " " | capitalize }}</h3>
+        <ul>
+        {% for r in repos_in_cat %}
+          <li><a href="/{{ r.id }}/">{{ r.id }}</a> — {{ r.description }}</li>
+        {% endfor %}
+        </ul>
       </article>
-      {% endfor %}
-    </section>
+      {% endif %}
+    {% endfor %}
+  </section>
 
-    <section class="band band--ecosystem">
-      <h2>The ecosystem</h2>
-      {% assign cats = "workspace-experience,core-runtime,identity-secrets,resident-culture,resident-domain,org-site" | split: "," %}
-      {% for cat in cats %}
-        {% assign repos_in_cat = site.data.agentculture_repos | where: "category", cat %}
-        {% if repos_in_cat.size > 0 %}
-        <article class="cat-card">
-          <h3>{{ cat | replace: "-", " " | capitalize }}</h3>
-          <ul>
-          {% for r in repos_in_cat %}
-            <li><a href="/{{ r.id }}/">{{ r.id }}</a> — {{ r.description }}</li>
-          {% endfor %}
-          </ul>
-        </article>
-        {% endif %}
-      {% endfor %}
-    </section>
-
-    <section class="band band--why">
-      <p>{{ site.data.landing.why_band.paragraph }}</p>
-      <a class="cta" href="{{ site.data.landing.why_band.href }}">{{ site.data.landing.why_band.cta }} →</a>
-    </section>
-  </main>
-</body>
-</html>
+  <section class="band band--why">
+    <p>{{ site.data.landing.why_band.paragraph }}</p>
+    <a class="cta" href="{{ site.data.landing.why_band.href }}">{{ site.data.landing.why_band.cta }} →</a>
+  </section>
+</div>

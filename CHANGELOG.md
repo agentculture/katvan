@@ -9,6 +9,15 @@ artifacts.
 
 ## [Unreleased]
 
+## [0.2.2] — 2026-05-18
+
+### Fixed
+
+- Left navigation now renders on the landing page at `/`. The home
+  layout used to be a standalone `<html>` document that bypassed the
+  just-the-docs `default` layout; it is now nested under `default` so
+  the sidebar matches every doc page.
+
 ## [0.2.0] — 2026-05-18
 
 ### Added
