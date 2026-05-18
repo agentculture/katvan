@@ -46,9 +46,13 @@ def run_doctor(client: Any, *, site_url: str) -> dict[str, Any]:
 
         {
           "site": "<site_url>",
-          "summary": {"total": N, "problems": M, "by_class": {...}},
+          "summary": {"total": N, "problems": M, "errors": E, "by_class": {...}},
           "problems": [
             {"url": "...", "classes": [...], "inspection": {<full inspect_url result>}},
+            ...
+          ],
+          "errors": [
+            {"url": "...", "error": "<ExceptionType: message>"},
             ...
           ],
         }
