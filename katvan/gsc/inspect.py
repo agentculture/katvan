@@ -4,6 +4,7 @@ from __future__ import annotations
 from typing import Any
 
 from katvan._errors import EXIT_USER_ERROR, KatvanError
+from katvan.gsc.client import call_with_translation
 
 
 def inspect_url(client: Any, *, url: str, site_url: str) -> dict[str, Any]:
@@ -19,13 +20,15 @@ def inspect_url(client: Any, *, url: str, site_url: str) -> dict[str, Any]:
             remediation="pass a URL that starts with the verified site URL",
         )
 
-    resp = (
-        client.urlInspection()
-        .index()
-        .inspect(body={"inspectionUrl": url, "siteUrl": site_url})
-        # num_retries: googleapiclient retries with exponential backoff on
-        # 5xx and 429 responses. Three attempts matches the spec.
-        .execute(num_retries=3)
+    resp = call_with_translation(
+        lambda: (
+            client.urlInspection()
+            .index()
+            .inspect(body={"inspectionUrl": url, "siteUrl": site_url})
+            # num_retries: googleapiclient retries with exponential backoff on
+            # 5xx and 429 responses. Three attempts matches the spec.
+            .execute(num_retries=3)
+        )
     )
     result = resp.get("inspectionResult", {}) or {}
     idx = result.get("indexStatusResult", {}) or {}

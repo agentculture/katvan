@@ -3,6 +3,8 @@ from __future__ import annotations
 
 from typing import Any
 
+from katvan.gsc.client import call_with_translation
+
 
 def _to_int(value: Any) -> int:
     """GSC returns numeric fields as strings; coerce defensively."""
@@ -34,7 +36,9 @@ def list_sitemaps(client: Any, *, site_url: str) -> list[dict[str, Any]]:
     """
     # num_retries: googleapiclient retries with exponential backoff on
     # 5xx and 429 responses. Three attempts matches the spec.
-    resp = client.sitemaps().list(siteUrl=site_url).execute(num_retries=3)
+    resp = call_with_translation(
+        lambda: client.sitemaps().list(siteUrl=site_url).execute(num_retries=3)
+    )
     rows: list[dict[str, Any]] = []
     for item in resp.get("sitemap", []) or []:
         rows.append({

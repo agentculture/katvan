@@ -6,7 +6,9 @@ from pathlib import Path
 from unittest.mock import MagicMock
 
 import pytest
+from googleapiclient.errors import HttpError
 
+from katvan._errors import EXIT_ENV_ERROR
 from katvan.cli._errors import KatvanError
 from katvan.gsc.inspect import inspect_url
 
@@ -76,3 +78,31 @@ def test_inspect_url_passes_correct_args_to_api() -> None:
     chain.assert_called_once_with(
         body={"inspectionUrl": "https://culture.dev/", "siteUrl": "https://culture.dev/"}
     )
+
+
+def _http_error(status: int) -> HttpError:
+    resp = MagicMock()
+    resp.status = status
+    resp.reason = "Forbidden"
+    return HttpError(resp=resp, content=b"")
+
+
+@pytest.mark.parametrize(
+    "status,expected_in_remediation",
+    [
+        (401, "docs/gsc-setup.md"),
+        (403, "docs/gsc-setup.md"),
+        (429, "retry later"),
+        (500, "check GSC property configuration"),
+    ],
+)
+def test_inspect_url_translates_http_error(
+    status: int, expected_in_remediation: str
+) -> None:
+    client = MagicMock()
+    chain = client.urlInspection.return_value.index.return_value.inspect
+    chain.return_value.execute.side_effect = _http_error(status)
+    with pytest.raises(KatvanError) as exc:
+        inspect_url(client, url="https://culture.dev/", site_url="https://culture.dev/")
+    assert exc.value.code == EXIT_ENV_ERROR
+    assert expected_in_remediation in exc.value.remediation
