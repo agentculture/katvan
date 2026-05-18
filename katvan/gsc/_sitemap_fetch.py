@@ -15,6 +15,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 from urllib.error import URLError
+from urllib.parse import urlparse
 from urllib.request import Request, urlopen
 
 from defusedxml import ElementTree as ET
@@ -42,8 +43,30 @@ class _Response:
 def _http_get(url: str) -> _Response:
     """Single seam patched in tests."""
     req = Request(url, headers={"User-Agent": _USER_AGENT})
-    with urlopen(req, timeout=_TIMEOUT_SECONDS) as resp:  # nosec B310 - scheme guarded in fetch_sitemap_urls
+    # nosec B310 - scheme AND netloc validated by `_validate_against`
+    # at every call site (top-level and each child sitemap).
+    with urlopen(req, timeout=_TIMEOUT_SECONDS) as resp:  # nosec B310
         return _Response(content=resp.read(), status_code=resp.status)
+
+
+def _validate_against(url: str, *, base_netloc: str) -> None:
+    """Raise KatvanError unless URL is http(s) and matches base_netloc."""
+    parsed = urlparse(url)
+    if parsed.scheme not in ("http", "https"):
+        raise KatvanError(
+            code=EXIT_ENV_ERROR,
+            message=f"sitemap URL must use http or https: {url}",
+            remediation="sitemap entries must point at the verified property",
+        )
+    if parsed.netloc != base_netloc:
+        raise KatvanError(
+            code=EXIT_ENV_ERROR,
+            message=(
+                f"sitemap URL host does not match the verified property: {url} "
+                f"(expected host {base_netloc})"
+            ),
+            remediation="sitemap entries must point at the verified property",
+        )
 
 
 def _fetch_or_raise(url: str) -> bytes:
@@ -88,12 +111,10 @@ def fetch_sitemap_urls(site_url: str) -> list[str]:
     """
     base = site_url.rstrip("/")
     top = f"{base}/sitemap.xml"
-    if not top.startswith(("http://", "https://")):
-        raise KatvanError(
-            code=EXIT_ENV_ERROR,
-            message=f"site URL must use http or https: {top}",
-            remediation="set KATVAN_GSC_SITE to a valid http(s) URL",
-        )
+    base_netloc = urlparse(top).netloc
+    # Self-check on the top-level URL — cheap, and keeps the scheme/netloc
+    # contract uniform across every fetch in this function.
+    _validate_against(top, base_netloc=base_netloc)
 
     root = _fetch_and_parse(top)
     local = root.tag[len(SITEMAP_NS):] if root.tag.startswith(SITEMAP_NS) else root.tag
@@ -104,6 +125,9 @@ def fetch_sitemap_urls(site_url: str) -> list[str]:
     if local == "sitemapindex":
         child_urls: list[str] = []
         for child in _parse_locs(root, "sitemap"):
+            # Defense in depth: a malicious sitemapindex must not redirect
+            # outbound fetches off the verified property.
+            _validate_against(child, base_netloc=base_netloc)
             child_root = _fetch_and_parse(child)
             child_urls.extend(_parse_locs(child_root, "url"))
         return child_urls

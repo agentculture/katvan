@@ -115,3 +115,39 @@ def test_malformed_xml_raises_katvan_error() -> None:
             fetch_sitemap_urls("https://culture.dev/")
     assert exc.value.code == EXIT_ENV_ERROR
     assert "parse" in exc.value.message.lower()
+
+
+def test_child_sitemap_with_off_origin_url_is_rejected() -> None:
+    """A sitemapindex pointing at a child on a different host must be rejected."""
+    evil_index_xml = b"""<?xml version="1.0" encoding="UTF-8"?>
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <sitemap><loc>https://evil.example.com/sitemap.xml</loc></sitemap>
+</sitemapindex>
+"""
+
+    def fake_get(url: str) -> _FakeResponse:
+        if url.endswith("sitemap.xml") and "culture.dev" in url:
+            return _FakeResponse(evil_index_xml)
+        raise AssertionError(f"fetch attempted for off-origin URL: {url}")
+
+    with patch("katvan.gsc._sitemap_fetch._http_get", side_effect=fake_get):
+        with pytest.raises(KatvanError) as exc:
+            fetch_sitemap_urls("https://culture.dev/")
+    assert "host does not match" in exc.value.message
+
+
+def test_child_sitemap_with_non_http_scheme_is_rejected() -> None:
+    """A sitemapindex pointing at a file:// child must be rejected."""
+    evil_index_xml = b"""<?xml version="1.0" encoding="UTF-8"?>
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <sitemap><loc>file:///etc/passwd</loc></sitemap>
+</sitemapindex>
+"""
+
+    def fake_get(url: str) -> _FakeResponse:
+        return _FakeResponse(evil_index_xml)
+
+    with patch("katvan.gsc._sitemap_fetch._http_get", side_effect=fake_get):
+        with pytest.raises(KatvanError) as exc:
+            fetch_sitemap_urls("https://culture.dev/")
+    assert "must use http or https" in exc.value.message
