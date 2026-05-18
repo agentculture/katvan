@@ -25,8 +25,8 @@ author:
 
 
 # Set after registering at https://search.google.com/search-console (URL-prefix
-# property for https://culture.dev/). Picked up by head_custom.html, not by the
-# just-the-docs theme directly. Leave commented to disable the meta tag.
+# property for https://culture.dev/). jekyll-seo-tag auto-emits the meta tag
+# from this key — no template changes needed. Leave commented to disable.
 # google_site_verification: "REPLACE_WITH_REAL_CODE_FROM_GSC"
 # webmaster_verifications:
 #   bing: "REPLACE_WITH_REAL_CODE_FROM_BING"
