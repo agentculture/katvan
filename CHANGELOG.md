@@ -9,6 +9,24 @@ artifacts.
 
 ## [Unreleased]
 
+## [0.3.0] — 2026-05-18
+
+### Added
+
+- New `katvan gsc` verb with `sitemaps`, `inspect`, and `doctor`
+  subcommands for Google Search Console indexing-health data (#26).
+- One-time setup guide at `docs/gsc-setup.md`.
+
+### Changed
+
+- `site/_config.culture.yml` documents the `google_site_verification`
+  config key (auto-emitted by `jekyll-seo-tag`).
+
+### Dependencies
+
+- Added `google-api-python-client`, `google-auth`, and `defusedxml` as
+  runtime deps.
+
 ## [0.2.8] — 2026-05-18
 
 ### Changed
