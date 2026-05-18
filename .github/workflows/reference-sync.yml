@@ -21,14 +21,11 @@ jobs:
       - name: Install katvan + every pull-reference sibling binary
         run: |
           uv tool install .
-          # Enumerate pull-reference repos from the registry so the list
-          # stays in sync as the registry evolves.
-          for repo in $(katvan overview --json | python3 -c "import json,sys; d=json.load(sys.stdin); print('\n'.join(e['id'] for cat in d['by_category'].values() for e in cat if e.get('docs_mode')=='pull-reference'))"); do
-            # Try the canonical package name (== repo id) first; siblings whose
-            # PyPI package name diverges (e.g. agentirc-cli for agentirc) will
-            # be skipped, which is acceptable — they're either docs_mode: skip
-            # already or their reference can't sync until packaging aligns.
-            uv tool install "$repo" || echo "skipped: $repo not installable"
+          # Enumerate pull-reference repos from the registry, honoring the
+          # optional `package:` override for siblings whose PyPI name
+          # diverges from their repo id (e.g. antoine → antoine-cli).
+          for pkg in $(katvan overview --json | python3 -c "import json,sys; d=json.load(sys.stdin); print('\n'.join((e.get('package') or e['id']) for cat in d['by_category'].values() for e in cat if e.get('docs_mode')=='pull-reference'))"); do
+            uv tool install "$pkg" || echo "skipped: $pkg not installable"
           done
 
       - name: Pull reference
