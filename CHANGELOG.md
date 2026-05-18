@@ -9,6 +9,25 @@ artifacts.
 
 ## [Unreleased]
 
+## [0.2.8] — 2026-05-18
+
+### Changed
+
+- `site/_data/agentculture_repos.yml`: flip `antoine` from
+  `docs_mode: skip` to `docs_mode: pull-reference`. Its CLI ships
+  AFI `learn --json` + `explain --json` today (verified by live
+  invocation), so the nightly cron now syncs antoine's reference
+  alongside the other pull-reference siblings.
+
+### Added
+
+- `site/docs/antoine/reference/`: initial reference pull from
+  `antoine-cli` 0.11.0 (greenfield status — `learn` is the only
+  noun; `explain` returns the greenfield message).
+- `site/docs/antoine/index.md`: trailing `[Reference →]` link,
+  matching the convention used by every other pull-reference
+  sibling.
+
 ## [0.2.7] — 2026-05-18
 
 ### Changed

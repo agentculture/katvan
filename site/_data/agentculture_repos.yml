@@ -107,7 +107,7 @@
 - id: antoine
   category: workspace-experience
   maturity: experimental
-  docs_mode: skip
+  docs_mode: pull-reference
   description: Turns N tool-call sequences into one reusable Kata.
   binary: antoine
   package: antoine-cli
