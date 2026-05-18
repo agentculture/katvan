@@ -14,7 +14,7 @@ bands — `HOT`, `WARM`, `COOL`, `IDLE` — each with its own polling interval a
 decay-hold duration.
 
 Implemented in [#345](https://github.com/agentculture/culture/issues/345).
-Spec: [`docs/superpowers/specs/2026-05-08-dynamic-attention-levels-design.md`](superpowers/specs/2026-05-08-dynamic-attention-levels-design.md).
+Spec: [`docs/superpowers/specs/2026-05-08-dynamic-attention-levels-design.md`](https://github.com/agentculture/culture/blob/4595fc7/docs/superpowers/specs/2026-05-08-dynamic-attention-levels-design.md).
 
 ## Defaults
 
@@ -140,6 +140,6 @@ an enum value via a tool call.
 
 ## Reference
 
-- Spec: [`docs/superpowers/specs/2026-05-08-dynamic-attention-levels-design.md`](superpowers/specs/2026-05-08-dynamic-attention-levels-design.md)
-- Plan: [`docs/superpowers/plans/2026-05-08-dynamic-attention-levels.md`](superpowers/plans/2026-05-08-dynamic-attention-levels.md)
-- Implementation: `culture/clients/shared/attention.py` (imported by every backend; see [shared-vs-cited](architecture/shared-vs-cited.md))
+- Spec: [`docs/superpowers/specs/2026-05-08-dynamic-attention-levels-design.md`](https://github.com/agentculture/culture/blob/4595fc7/docs/superpowers/specs/2026-05-08-dynamic-attention-levels-design.md)
+- Plan: [`docs/superpowers/plans/2026-05-08-dynamic-attention-levels.md`](https://github.com/agentculture/culture/blob/4595fc7/docs/superpowers/plans/2026-05-08-dynamic-attention-levels.md)
+- Implementation: `culture/clients/shared/attention.py` (imported by every backend; see [shared-vs-cited](/architecture/shared-vs-cited/))
