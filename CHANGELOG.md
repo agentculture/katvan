@@ -9,6 +9,30 @@ artifacts.
 
 ## [Unreleased]
 
+## [0.2.3] — 2026-05-18
+
+### Fixed
+
+- Site: repaired broken internal links flagged by Google Search Console.
+  Footer dropped the non-existent `/reference/cli/devex/` mention and
+  re-pointed `/ecosystem-map/` (404) → `/ecosystem/`. The 21
+  `docs/<repo>/index.md` overview pages had a `[Reference →](reference/)`
+  link resolving to `/<repo>/reference/`, but the real refs live at
+  `/docs/<repo>/reference/` — rewrote the 8 with a companion, removed
+  the dead line from the 13 without. Home-page pills dropped two
+  unbuilt `/docs/persistent-agents/` and `/docs/works-with-your-stack/`
+  hrefs; layout now omits "Learn more →" when `pill.href` is absent.
+
+### Added
+
+- `_includes/head_custom.html` now documents the `canonical_url:`
+  frontmatter escape hatch (jekyll-seo-tag honors it natively) for
+  future per-page canonical overrides.
+- CI: advisory `html-proofer` step in `docs-check.yml` catches broken
+  internal links at PR time. Three vendored pages with repo-relative
+  paths from sibling imports are ignored at file level until the
+  librarian import learns to rewrite them.
+
 ## [0.2.2] — 2026-05-18
 
 ### Fixed

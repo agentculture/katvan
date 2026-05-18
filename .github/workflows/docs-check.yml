@@ -40,16 +40,21 @@ jobs:
         env:
           JEKYLL_ENV: production
 
+      - name: Install html-proofer
+        # Installed standalone (not via Gemfile) so the Cloudflare Pages build
+        # doesn't have to compile its native deps. CI is the only place we
+        # need it.
+        run: gem install --no-document html-proofer -v "~> 5.0"
+
       - name: Check internal links (advisory)
-        # Warn-only for now: 7 broken links remain in vendored sibling content
-        # (docs/attention.md, docs/coverage-baseline.md, docs/architecture/shared-vs-cited.md)
-        # whose `../pyproject.toml` / `superpowers/` paths are repo-relative
-        # and should be rewritten in the librarian import. Track via that work,
-        # then flip continue-on-error off.
+        # Warn-only for now: 3 vendored pages (attention, coverage-baseline,
+        # architecture/shared-vs-cited) carry repo-relative paths from their
+        # source repos; rewriting those belongs in the librarian import, not
+        # here. Flip continue-on-error off once that lands.
         working-directory: site
         continue-on-error: true
         run: |
-          bundle exec htmlproofer _site_culture \
+          htmlproofer _site_culture \
             --disable-external \
             --allow-hash-href \
-            --ignore-urls "/^/agentirc/,/^/agex/,/^/afi/,/^/citation-cli/"
+            --ignore-files "/attention/index.html$/,/coverage-baseline/index.html$/,/architecture/shared-vs-cited/index.html$/"
