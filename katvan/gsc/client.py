@@ -15,15 +15,13 @@ from __future__ import annotations
 
 import os
 from pathlib import Path
-from typing import Any, Callable, TypeVar
+from typing import Any, Callable
 
 from google.oauth2 import service_account
 from googleapiclient import discovery
 from googleapiclient.errors import HttpError
 
 from katvan._errors import EXIT_ENV_ERROR, KatvanError
-
-T = TypeVar("T")
 
 SCOPE = "https://www.googleapis.com/auth/webmasters.readonly"
 DEFAULT_SITE_URL = "https://culture.dev/"
@@ -71,7 +69,7 @@ def build_client() -> Any:
     )
 
 
-def call_with_translation(action: Callable[[], T]) -> T:
+def call_with_translation[T](action: Callable[[], T]) -> T:
     """Invoke a googleapiclient call and translate HttpError to KatvanError.
 
     401/403 -> EXIT_ENV_ERROR, "check the SA is granted on the GSC property"
