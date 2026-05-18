@@ -21,6 +21,8 @@ from katvan.gsc.doctor import run_doctor
 from katvan.gsc.inspect import inspect_url
 from katvan.gsc.sitemaps import list_sitemaps
 
+_JSON_HELP = "Emit structured JSON."
+
 
 # ----- subcommand handlers -----------------------------------------------------
 
@@ -136,13 +138,13 @@ def register(sub: argparse._SubParsersAction) -> None:
 
     # `sitemaps` subcommand.
     s = gsub.add_parser("sitemaps", help="List submitted sitemaps and status.")
-    s.add_argument("--json", action="store_true", help="Emit structured JSON.")
+    s.add_argument("--json", action="store_true", help=_JSON_HELP)
     s.set_defaults(gsc_func=_cmd_sitemaps)
 
     # `inspect` subcommand.
     i = gsub.add_parser("inspect", help="Inspect a single URL's indexing status.")
     i.add_argument("url", help="The URL to inspect (must be under the verified property).")
-    i.add_argument("--json", action="store_true", help="Emit structured JSON.")
+    i.add_argument("--json", action="store_true", help=_JSON_HELP)
     i.set_defaults(gsc_func=_cmd_inspect)
 
     # `doctor` subcommand.
@@ -150,5 +152,5 @@ def register(sub: argparse._SubParsersAction) -> None:
         "doctor",
         help="Audit every sitemap URL; exit 1 if any problems are found.",
     )
-    d.add_argument("--json", action="store_true", help="Emit structured JSON.")
+    d.add_argument("--json", action="store_true", help=_JSON_HELP)
     d.set_defaults(gsc_func=_cmd_doctor)
