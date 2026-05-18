@@ -30,7 +30,8 @@ layout: default
         <h3>{{ cat | replace: "-", " " | capitalize }}</h3>
         <ul>
         {% for r in repos_in_cat %}
-          <li><a href="/{{ r.id }}/">{{ r.id }}</a> — {{ r.description }}</li>
+          {% if r.site_path %}{% assign r_path = r.site_path %}{% else %}{% assign r_path = r.id | prepend: "/" | append: "/" %}{% endif %}
+          <li><a href="{{ r_path }}">{{ r.id }}</a> — {{ r.description }}</li>
         {% endfor %}
         </ul>
       </article>

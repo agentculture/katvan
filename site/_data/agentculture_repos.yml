@@ -20,6 +20,11 @@
 #   package      (optional) PyPI package name if applicable
 #   binary       (optional) CLI binary name if applicable
 #   docs         (optional) absolute URL — culture.dev page or repo README
+#   site_path    (optional) the canonical katvan-site path for this repo,
+#                  if it differs from `/<id>/`. Set this when a repo's
+#                  docs live under a different slug (e.g. `agex-cli`'s
+#                  docs live at `/agex/`). Templates fall back to
+#                  `/<id>/` when this is unset.
 #   install      (optional) one-line install command
 #   caveat       (optional) one short sentence — a current public-facing
 #                  limitation a reader should know about
@@ -77,6 +82,7 @@
   description: Improve an agent's developer experience; powers `culture devex`.
   binary: agex
   docs: https://culture.dev/agex/
+  site_path: /agex/
   caveat: "Reference sync deferred — `agex learn` does not yet support `--json`."
   related: [culture]
 
