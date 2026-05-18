@@ -68,6 +68,32 @@ def _cmd_inspect(args: argparse.Namespace) -> int:
     return 0
 
 
+def _format_doctor_text(report: dict) -> str:
+    """Render the doctor report as a markdown-style text block."""
+    lines = [
+        f"# GSC doctor report: {report['site']}",
+        "",
+        f"Total URLs: {report['summary']['total']}",
+        f"Problems:   {report['summary']['problems']}",
+    ]
+    if report["summary"]["by_class"]:
+        lines.append("")
+        lines.append("## By class")
+        for cls, count in sorted(report["summary"]["by_class"].items()):
+            lines.append(f"- {cls}: {count}")
+    if report["problems"]:
+        lines.append("")
+        lines.append("## Problem URLs")
+        for p in report["problems"]:
+            lines.append(f"- {p['url']}  ({', '.join(p['classes'])})")
+    if report["errors"]:
+        lines.append("")
+        lines.append("## Errors (inspection failed)")
+        for e in report["errors"]:
+            lines.append(f"- {e['url']}  ({e['error']})")
+    return "\n".join(lines)
+
+
 def _cmd_doctor(args: argparse.Namespace) -> int:
     client = build_client()
     report = run_doctor(client, site_url=site_url())
@@ -75,28 +101,7 @@ def _cmd_doctor(args: argparse.Namespace) -> int:
     if json_mode:
         emit_result(report, json_mode=True)
     else:
-        lines = [
-            f"# GSC doctor report: {report['site']}",
-            "",
-            f"Total URLs: {report['summary']['total']}",
-            f"Problems:   {report['summary']['problems']}",
-        ]
-        if report["summary"]["by_class"]:
-            lines.append("")
-            lines.append("## By class")
-            for cls, count in sorted(report["summary"]["by_class"].items()):
-                lines.append(f"- {cls}: {count}")
-        if report["problems"]:
-            lines.append("")
-            lines.append("## Problem URLs")
-            for p in report["problems"]:
-                lines.append(f"- {p['url']}  ({', '.join(p['classes'])})")
-        if report["errors"]:
-            lines.append("")
-            lines.append("## Errors (inspection failed)")
-            for e in report["errors"]:
-                lines.append(f"- {e['url']}  ({e['error']})")
-        emit_result("\n".join(lines), json_mode=False)
+        emit_result(_format_doctor_text(report), json_mode=False)
     # Exit non-zero if ANY problems found OR if some URLs failed inspection.
     has_problems = report["summary"]["problems"] > 0
     has_errors = report["summary"]["errors"] > 0
