@@ -9,6 +9,20 @@ artifacts.
 
 ## [Unreleased]
 
+## [0.2.4] — 2026-05-18
+
+### Fixed
+
+- Site: rewrote the 7 broken internal links in the three vendored
+  pages (`attention`, `coverage-baseline`, `architecture/shared-vs-cited`)
+  whose repo-relative paths (`../pyproject.toml`,
+  `superpowers/specs/…`, `../../CLAUDE.md#citation-pattern`) carried
+  over from the original culture-repo import. Each now resolves to an
+  absolute GitHub URL on `agentculture/culture`.
+- CI: dropped the file-scoped `--ignore-files` workaround and the
+  `continue-on-error: true` flag from the html-proofer step in
+  `docs-check.yml`. The link check is now a hard gate.
+
 ## [0.2.3] — 2026-05-18
 
 ### Fixed
