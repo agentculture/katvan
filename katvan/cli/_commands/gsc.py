@@ -1,0 +1,76 @@
+"""``katvan gsc`` — Google Search Console read-only verbs.
+
+Subcommands:
+
+* ``sitemaps`` — list submitted sitemaps and status.
+* ``inspect <url>`` — single-URL inspection (Task 7).
+* ``doctor`` — composite indexing-health audit (Task 9).
+
+Wiring follows the existing one-file-per-verb pattern in this directory.
+Subcommands dispatch through ``args.gsc_func``; the top-level ``cmd_gsc``
+delegates to that handler, or prints the verb help when no subcommand is given.
+"""
+from __future__ import annotations
+
+import argparse
+
+from katvan.cli._errors import EXIT_USER_ERROR, KatvanError
+from katvan.cli._output import emit_result
+from katvan.gsc.client import build_client, site_url
+from katvan.gsc.sitemaps import list_sitemaps
+
+
+# ----- subcommand handlers -----------------------------------------------------
+
+def _cmd_sitemaps(args: argparse.Namespace) -> int:
+    client = build_client()
+    rows = list_sitemaps(client, site_url=site_url())
+    json_mode = bool(getattr(args, "json", False))
+    if json_mode:
+        emit_result({"site": site_url(), "sitemaps": rows}, json_mode=True)
+    else:
+        if not rows:
+            emit_result("(no sitemaps submitted)", json_mode=False)
+        else:
+            lines = []
+            for row in rows:
+                lines.append(
+                    f"{row['path']}\t"
+                    f"last_downloaded={row['last_downloaded'] or '-'}\t"
+                    f"errors={row['errors']}\twarnings={row['warnings']}"
+                )
+            emit_result("\n".join(lines), json_mode=False)
+    return 0
+
+
+# ----- top-level verb dispatch -------------------------------------------------
+
+def cmd_gsc(args: argparse.Namespace) -> int:
+    handler = getattr(args, "gsc_func", None)
+    if handler is None:
+        # No subcommand given. Argparse alone won't catch this because the
+        # subparsers are optional (so `--help` works without crashing); we
+        # raise a KatvanError instead of printing help to keep error
+        # contract uniform.
+        raise KatvanError(
+            code=EXIT_USER_ERROR,
+            message="missing gsc subcommand",
+            remediation="run 'katvan gsc --help' to see subcommands",
+        )
+    return handler(args)
+
+
+def register(sub: argparse._SubParsersAction) -> None:
+    p = sub.add_parser(
+        "gsc",
+        help="Google Search Console read-only verbs (sitemaps, inspect, doctor).",
+    )
+    p.set_defaults(func=cmd_gsc)
+    p.add_argument("--json", action="store_true", help="Emit structured JSON.")
+
+    gsub = p.add_subparsers(dest="gsc_command")
+
+    # `sitemaps` subcommand.
+    s = gsub.add_parser("sitemaps", help="List submitted sitemaps and status.")
+    s.add_argument("--json", action="store_true", help="Emit structured JSON.")
+    s.set_defaults(gsc_func=_cmd_sitemaps)
