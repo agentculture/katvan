@@ -15,6 +15,8 @@ from pathlib import Path
 from katvan import repos
 from katvan.cli._output import emit_result
 
+_INDEX_MD = "index.md"
+
 
 def register(sub: argparse._SubParsersAction) -> None:
     parser = sub.add_parser("doctor", help="check culture.dev IA health")
@@ -26,11 +28,11 @@ def _check_index(site_root: Path, entry: dict) -> str | None:
     site_path = entry.get("site_path")
     if site_path:
         rel = site_path.strip("/")
-        page = site_root / rel / "index.md"
-        rel_display = f"site/{rel}/index.md"
+        page = site_root / rel / _INDEX_MD
+        rel_display = f"site/{rel}/{_INDEX_MD}"
     else:
-        page = site_root / "docs" / entry["id"] / "index.md"
-        rel_display = f"site/docs/{entry['id']}/index.md"
+        page = site_root / "docs" / entry["id"] / _INDEX_MD
+        rel_display = f"site/docs/{entry['id']}/{_INDEX_MD}"
     if not page.is_file():
         return f"missing {rel_display} (hand-authored page)"
     if not page.read_text().strip():
@@ -41,9 +43,12 @@ def _check_index(site_root: Path, entry: dict) -> str | None:
 def _check_reference(site_root: Path, entry: dict) -> str | None:
     if entry.get("docs_mode") != "pull-reference":
         return None
-    ref = site_root / "docs" / entry["id"] / "reference" / "index.md"
+    ref = site_root / "docs" / entry["id"] / "reference" / _INDEX_MD
     if not ref.is_file():
-        return f"missing site/docs/{entry['id']}/reference/index.md (run `katvan pull {entry['id']}`)"
+        return (
+            f"missing site/docs/{entry['id']}/reference/{_INDEX_MD} "
+            f"(run `katvan pull {entry['id']}`)"
+        )
     return None
 
 

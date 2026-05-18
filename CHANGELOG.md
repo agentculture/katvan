@@ -9,6 +9,15 @@ artifacts.
 
 ## [Unreleased]
 
+## [0.2.6] — 2026-05-18
+
+### Fixed
+
+- `katvan/cli/_commands/doctor.py`: extract `"index.md"` literal into a
+  module-level `_INDEX_MD` constant. Resolves SonarCloud's
+  duplicate-literal finding on the `_check_index` + `_check_reference`
+  pair landed in 0.2.5.
+
 ## [0.2.5] — 2026-05-18
 
 ### Added
