@@ -1,5 +1,6 @@
 ---
 title: Getting started
+parent: agex
 sites: [culture]
 permalink: /agex/getting-started/
 nav_order: 2

@@ -1,5 +1,6 @@
 ---
 title: Skill sources
+parent: agex
 sites: [culture]
 permalink: /agex/skill-sources/
 nav_order: 5
