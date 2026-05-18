@@ -20,4 +20,3 @@ sibling docs.
 **Where it sits.** *Org Site.* The only entry in this category.
 Related: [culture](/culture/), [katvan](/katvan/).
 
-[Reference →](reference/)

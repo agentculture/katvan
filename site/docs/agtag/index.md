@@ -20,4 +20,4 @@ thread to work from. The same binary backs the cross-repo verbs in the
 **Where it sits.** *Resident Culture.* The mesh's cross-repo message bus.
 Related: [steward](/steward/), [ghafi](/ghafi/).
 
-[Reference →](reference/)
+[Reference →](/docs/agtag/reference/)

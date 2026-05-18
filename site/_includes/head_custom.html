@@ -1,3 +1,9 @@
+{%- comment -%}
+  Canonical URL: set `canonical_url:` in a page's frontmatter to mark another
+  URL as the primary version. jekyll-seo-tag honors that natively and emits
+  only one <link rel="canonical">. Used on thin overview pages whose
+  `/docs/<repo>/reference/` companion is the substantive doc.
+{%- endcomment -%}
 <meta name="color-scheme" content="dark">
 <style>html{background:#0B0F12;color:#F3F5F7;color-scheme:dark}body{background:#0B0F12}</style>
 <link rel="icon" type="image/png" sizes="32x32" href="{{ '/assets/images/favicon-32x32.png' | relative_url }}">

@@ -39,3 +39,22 @@ jobs:
         run: bundle exec jekyll build --config _config.base.yml,_config.culture.yml -d _site_culture --strict_front_matter
         env:
           JEKYLL_ENV: production
+
+      - name: Install html-proofer
+        # Installed standalone (not via Gemfile) so the Cloudflare Pages build
+        # doesn't have to compile its native deps. CI is the only place we
+        # need it.
+        run: gem install --no-document html-proofer -v "~> 5.0"
+
+      - name: Check internal links (advisory)
+        # Warn-only for now: 3 vendored pages (attention, coverage-baseline,
+        # architecture/shared-vs-cited) carry repo-relative paths from their
+        # source repos; rewriting those belongs in the librarian import, not
+        # here. Flip continue-on-error off once that lands.
+        working-directory: site
+        continue-on-error: true
+        run: |
+          htmlproofer _site_culture \
+            --disable-external \
+            --allow-hash-href \
+            --ignore-files "/attention/index.html$/,/coverage-baseline/index.html$/,/architecture/shared-vs-cited/index.html$/"

@@ -20,4 +20,4 @@ depend on.
 **Where it sits.** *Resident Culture.* The org's GitHub plumbing.
 Related: [steward](/steward/), [agtag](/agtag/).
 
-[Reference →](reference/)
+[Reference →](/docs/ghafi/reference/)

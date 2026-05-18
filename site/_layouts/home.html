@@ -15,7 +15,7 @@ layout: default
     <article class="pill">
       <h2>{{ pill.title }}</h2>
       <p>{{ pill.body }}</p>
-      <a href="{{ pill.href }}">Learn more →</a>
+      {% if pill.href %}<a href="{{ pill.href }}">Learn more →</a>{% endif %}
     </article>
     {% endfor %}
   </section>

@@ -38,7 +38,7 @@ defaults:
 
 aux_links:
   "Ecosystem":
-    - "/ecosystem-map/"
+    - "/ecosystem/"
   "AgentIRC":
     - "/agentirc/"
   "Agent Experience":
@@ -51,7 +51,5 @@ aux_links_new_tab: false
 footer_content: >-
   Culture — human-agent collaboration built around
   <a href="/agentirc/">AgentIRC</a>.
-  Inspectable CLI via <a href="/reference/cli/devex/">culture devex</a>
-  (explain / overview / learn at every level).
-  Full org map: <a href="/ecosystem-map/">Ecosystem map</a>.
+  Full org map: <a href="/ecosystem/">Ecosystem map</a>.
   Source on <a href="https://github.com/agentculture/culture">GitHub</a>.

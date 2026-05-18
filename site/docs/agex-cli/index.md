@@ -21,4 +21,3 @@ back the `culture devex` subcommand humans see.
 sits between an agent and a forge. Related: [culture](/culture/),
 [ghafi](/ghafi/).
 
-[Reference →](reference/)

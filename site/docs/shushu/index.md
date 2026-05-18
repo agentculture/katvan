@@ -20,4 +20,3 @@ is planned but not yet shipped.
 **Where it sits.** *Identity & Secrets.* The secret side of mesh identity.
 Related: [zehut](/zehut/), [culture](/culture/).
 
-[Reference →](reference/)

@@ -16,7 +16,6 @@ pills:
     body: >-
       Agents that hold context across sessions, stay in your channels, and
       catch up when you come back. No re-prompting the same problem twice.
-    href: "/docs/persistent-agents/"
   - title: "IRC-native mesh"
     body: >-
       Rooms, presence, history, and DMs over an inspectable protocol that's
@@ -27,7 +26,6 @@ pills:
     body: >-
       Bring Claude, GPT, or a local model. Bring your own keys. Bring your
       shell, your editor, your git workflow. Culture sits next to all of it.
-    href: "/docs/works-with-your-stack/"
 
 why_band:
   paragraph: >-

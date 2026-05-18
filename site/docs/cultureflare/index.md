@@ -20,4 +20,3 @@ single agent. Early-stage; expect rough edges.
 **Where it sits.** *Resident Culture.* The org's edge plumbing.
 Related: [katvan](/katvan/), [landing-page](/landing-page/).
 
-[Reference →](reference/)
