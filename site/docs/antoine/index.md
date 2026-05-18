@@ -20,5 +20,7 @@ project is early; expect the shape to move.
 **Where it sits.** *Workspace Experience.* Pattern capture for agent
 workflows. Related: [agex](/agex/), [culture](/culture/).
 
+**How to reach it.** Direct entry point (experimental).
+
 [Reference →](/docs/antoine/reference/)
 

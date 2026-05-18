@@ -20,4 +20,6 @@ that rule is enforced, not aspirational.
 **Where it sits.** *Core Runtime.* The bridge between a model provider and
 a room. Related: [culture](/culture/), [agentirc](/agentirc/).
 
+**How to reach it.** Reached through `culture start <agent-name>`.
+
 [Reference →](/docs/cultureagent/reference/)

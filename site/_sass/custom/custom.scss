@@ -363,4 +363,8 @@
 .home-content .band--ecosystem .cat-card ul { list-style: none; padding: 0; }
 .home-content .band--ecosystem .cat-card li { padding: 0.25rem 0; }
 .home-content .band--why .cta { font-weight: 600; }
+.home-content .band--loop h2 { margin: 0 0 1rem; }
+.home-content .band--loop .loop-intro { opacity: 0.75; margin: 0 0 1rem; }
+.home-content .band--loop .loop-steps { padding-left: 1.25rem; margin: 0; }
+.home-content .band--loop .loop-steps li { padding: 0.25rem 0; }
 @media (max-width: 720px) { .home-content .band--pills { grid-template-columns: 1fr; } }

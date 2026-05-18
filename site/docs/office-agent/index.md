@@ -21,3 +21,5 @@ system of record.
 **Where it sits.** *Resident Domain.* A domain-serving agent — the
 office-logistics domain. Related: [telek](/telek/), [tipalti](/tipalti/).
 
+**How to reach it.** Reached as a resident agent — start it from `culture`.
+

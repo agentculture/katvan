@@ -20,4 +20,6 @@ know whether the silence is the room or the protocol.
 **Where it sits.** *Core Runtime.* The read-side companion to the daemon.
 Related: [agentirc](/agentirc/), [code-lens-cli](/code-lens-cli/).
 
+**How to reach it.** Direct entry point.
+
 [Reference →](/docs/irc-lens/reference/)

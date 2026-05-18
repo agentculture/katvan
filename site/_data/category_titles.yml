@@ -1,0 +1,10 @@
+# site/_data/category_titles.yml
+# Display names for ecosystem category slugs. Used by templates that would
+# otherwise downcase multi-word categories via Liquid's `capitalize` filter
+# (which only touches the first character).
+workspace-experience: "Workspace Experience"
+core-runtime: "Core Runtime"
+identity-secrets: "Identity & Secrets"
+resident-culture: "Resident Agents"
+resident-domain: "Resident Domain"
+org-site: "Org Site"

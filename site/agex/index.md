@@ -1,7 +1,7 @@
 ---
 title: agex
+parent: "Workspace Experience"
 has_children: true
-nav_order: 1
 sites: [culture]
 permalink: /agex/
 description: Agent-operated developer-experience CLI for autonomous coding agents.

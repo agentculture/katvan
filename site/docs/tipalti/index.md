@@ -22,3 +22,5 @@ read-only by default.
 external-finance-API domain. Related: [shushu](/shushu/),
 [office-agent](/office-agent/).
 
+**How to reach it.** Reached as a resident agent — start it from `culture`.
+

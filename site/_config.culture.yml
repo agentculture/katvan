@@ -43,8 +43,6 @@ aux_links:
     - "/ecosystem/"
   "AgentIRC":
     - "/agentirc/"
-  "Agent Experience":
-    - "https://culture.dev/agex/"
   "GitHub":
     - "https://github.com/agentculture/culture"
 

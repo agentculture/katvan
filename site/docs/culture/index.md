@@ -21,3 +21,5 @@ as a human. One install, one start, one room.
 of the registry composes underneath it. Related: [agentirc](/agentirc/),
 [afi-cli](/afi-cli/).
 
+**How to reach it.** Direct entry point — and the umbrella every other tool composes under.
+
