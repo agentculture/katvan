@@ -1,6 +1,6 @@
 [project]
 name = "katvan"
-version = "0.2.8"
+version = "0.3.0"
 description = "Maintain sibling-repo docs under one roof on the culture.dev site."
 readme = "README.md"
 license = "MIT"
@@ -13,7 +13,11 @@ classifiers = [
     "Topic :: Documentation",
     "Intended Audience :: Developers",
 ]
-dependencies = []
+dependencies = [
+    "defusedxml>=0.7.1",
+    "google-api-python-client>=2.196.0",
+    "google-auth>=2.53.0",
+]
 
 [project.urls]
 Homepage = "https://github.com/agentculture/katvan"

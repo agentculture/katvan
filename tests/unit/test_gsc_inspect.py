@@ -1,0 +1,108 @@
+"""Tests for :mod:`katvan.gsc.inspect`."""
+from __future__ import annotations
+
+import json
+from pathlib import Path
+from unittest.mock import MagicMock
+
+import pytest
+from googleapiclient.errors import HttpError
+
+from katvan._errors import EXIT_ENV_ERROR
+from katvan.cli._errors import KatvanError
+from katvan.gsc.inspect import inspect_url
+
+FIX = Path(__file__).resolve().parent.parent / "fixtures" / "gsc"
+
+
+def _fake_client(payload: dict) -> MagicMock:
+    client = MagicMock()
+    chain = client.urlInspection.return_value.index.return_value.inspect
+    chain.return_value.execute.return_value = payload
+    return client
+
+
+def test_inspect_url_pass_extracts_fields() -> None:
+    payload = json.loads((FIX / "url-inspection-pass.json").read_text())
+    client = _fake_client(payload)
+    result = inspect_url(client, url="https://culture.dev/", site_url="https://culture.dev/")
+    assert result["url"] == "https://culture.dev/"
+    assert result["verdict"] == "PASS"
+    assert result["coverage_state"] == "Submitted and indexed"
+    assert result["robots_txt_state"] == "ALLOWED"
+    assert result["page_fetch_state"] == "SUCCESSFUL"
+    assert result["google_canonical"] == "https://culture.dev/"
+    assert result["user_canonical"] == "https://culture.dev/"
+    assert result["mobile_usability"] == "PASS"
+    assert result["rich_results"] == "PASS"
+
+
+def test_inspect_url_not_indexed_returns_neutral_verdict() -> None:
+    payload = json.loads((FIX / "url-inspection-not-indexed.json").read_text())
+    client = _fake_client(payload)
+    result = inspect_url(
+        client, url="https://culture.dev/missing/", site_url="https://culture.dev/"
+    )
+    assert result["verdict"] == "NEUTRAL"
+    assert result["coverage_state"] == "URL is not on Google"
+    assert result["mobile_usability"] == ""
+    assert result["rich_results"] == ""
+
+
+def test_inspect_url_rejects_url_outside_site() -> None:
+    client = MagicMock()
+    with pytest.raises(KatvanError) as exc:
+        inspect_url(
+            client, url="https://example.com/", site_url="https://culture.dev/"
+        )
+    assert "outside the verified property" in exc.value.message
+    client.urlInspection.assert_not_called()
+
+
+def test_inspect_url_rejects_substring_host_confusion() -> None:
+    client = MagicMock()
+    with pytest.raises(KatvanError):
+        # culture.dev/ as the site, evil host that starts with culture.dev
+        inspect_url(
+            client,
+            url="https://culture.dev.evil.com/x",
+            site_url="https://culture.dev/",
+        )
+
+
+def test_inspect_url_passes_correct_args_to_api() -> None:
+    payload = json.loads((FIX / "url-inspection-pass.json").read_text())
+    client = _fake_client(payload)
+    inspect_url(client, url="https://culture.dev/", site_url="https://culture.dev/")
+    chain = client.urlInspection.return_value.index.return_value.inspect
+    chain.assert_called_once_with(
+        body={"inspectionUrl": "https://culture.dev/", "siteUrl": "https://culture.dev/"}
+    )
+
+
+def _http_error(status: int) -> HttpError:
+    resp = MagicMock()
+    resp.status = status
+    resp.reason = "Forbidden"
+    return HttpError(resp=resp, content=b"")
+
+
+@pytest.mark.parametrize(
+    "status,expected_in_remediation",
+    [
+        (401, "docs/gsc-setup.md"),
+        (403, "docs/gsc-setup.md"),
+        (429, "retry later"),
+        (500, "check GSC property configuration"),
+    ],
+)
+def test_inspect_url_translates_http_error(
+    status: int, expected_in_remediation: str
+) -> None:
+    client = MagicMock()
+    chain = client.urlInspection.return_value.index.return_value.inspect
+    chain.return_value.execute.side_effect = _http_error(status)
+    with pytest.raises(KatvanError) as exc:
+        inspect_url(client, url="https://culture.dev/", site_url="https://culture.dev/")
+    assert exc.value.code == EXIT_ENV_ERROR
+    assert expected_in_remediation in exc.value.remediation

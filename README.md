@@ -27,6 +27,8 @@ Verbs available today:
   (supports `--json`).
 - `katvan explain <path>` — markdown docs for any noun/verb path
   (supports `--json`).
+- `katvan gsc {sitemaps,inspect,doctor}` — read indexing-health data from
+  Google Search Console (one-time setup: [`docs/gsc-setup.md`](docs/gsc-setup.md)).
 
 The docs verbs — `overview`, `pull`, and `doctor` — land in a later
 release, ported from the `librarian` skill.

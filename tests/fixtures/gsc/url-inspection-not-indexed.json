@@ -1,0 +1,13 @@
+{
+  "inspectionResult": {
+    "indexStatusResult": {
+      "verdict": "NEUTRAL",
+      "coverageState": "URL is not on Google",
+      "lastCrawlTime": "2026-05-10T08:00:00Z",
+      "robotsTxtState": "ALLOWED",
+      "pageFetchState": "SUCCESSFUL",
+      "googleCanonical": "",
+      "userCanonical": "https://culture.dev/missing/"
+    }
+  }
+}

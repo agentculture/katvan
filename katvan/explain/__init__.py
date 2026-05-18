@@ -6,7 +6,7 @@ for lookup. Every noun/verb in the CLI should have a catalog entry.
 
 from __future__ import annotations
 
-from katvan.cli._errors import EXIT_USER_ERROR, KatvanError
+from katvan._errors import EXIT_USER_ERROR, KatvanError
 from katvan.explain.catalog import ENTRIES
 
 

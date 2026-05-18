@@ -35,7 +35,7 @@ import sys
 from pathlib import Path
 from typing import Iterator
 
-from katvan.cli._errors import EXIT_ENV_ERROR, EXIT_USER_ERROR, KatvanError
+from katvan._errors import EXIT_ENV_ERROR, EXIT_USER_ERROR, KatvanError
 
 # Relative location of the registry within a katvan checkout.
 _REGISTRY_REL = Path("site/_data/agentculture_repos.yml")

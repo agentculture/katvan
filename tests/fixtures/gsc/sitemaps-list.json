@@ -1,0 +1,17 @@
+{
+  "sitemap": [
+    {
+      "path": "https://culture.dev/sitemap.xml",
+      "lastSubmitted": "2026-05-01T08:30:00.000Z",
+      "lastDownloaded": "2026-05-17T14:22:00.000Z",
+      "isPending": false,
+      "isSitemapsIndex": false,
+      "type": "sitemap",
+      "errors": "0",
+      "warnings": "1",
+      "contents": [
+        {"type": "web", "submitted": "94", "indexed": "91"}
+      ]
+    }
+  ]
+}

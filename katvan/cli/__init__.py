@@ -28,6 +28,7 @@ import sys
 from katvan import __version__
 from katvan.cli._commands import doctor as _doctor_cmd
 from katvan.cli._commands import explain as _explain_cmd
+from katvan.cli._commands import gsc as _gsc_cmd
 from katvan.cli._commands import learn as _learn_cmd
 from katvan.cli._commands import overview as _overview_cmd
 from katvan.cli._commands import pull as _pull_cmd
@@ -89,6 +90,7 @@ def _build_parser() -> argparse.ArgumentParser:
     _overview_cmd.register(sub)
     _pull_cmd.register(sub)
     _doctor_cmd.register(sub)
+    _gsc_cmd.register(sub)
 
     return parser
 
