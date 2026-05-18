@@ -95,3 +95,17 @@ def test_gsc_help_lists_sitemaps_subcommand(
         main(["gsc", "--help"])
     out = capsys.readouterr().out
     assert "sitemaps" in out
+
+
+def test_gsc_parent_json_flag_is_not_supported(
+    capsys: pytest.CaptureFixture[str], gsc_env: None
+) -> None:
+    """`katvan gsc --json sitemaps` should fail — --json belongs on subcommands."""
+    with pytest.raises(SystemExit):
+        main(["gsc", "--json", "sitemaps"])
+    err = capsys.readouterr().err
+    # The dispatcher may surface argparse failures as either a plain "error:"
+    # line or as structured JSON; either way, the `--json` token must be the
+    # rejected argument so the user sees a real error rather than silent drop.
+    assert "--json" in err
+    assert "error" in err.lower() or "unrecognized" in err.lower()

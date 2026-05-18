@@ -132,7 +132,6 @@ def register(sub: argparse._SubParsersAction) -> None:
         help="Google Search Console read-only verbs (sitemaps, inspect, doctor).",
     )
     p.set_defaults(func=cmd_gsc)
-    p.add_argument("--json", action="store_true", help="Emit structured JSON.")
 
     gsub = p.add_subparsers(dest="gsc_command")
 
