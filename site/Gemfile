@@ -6,3 +6,7 @@ gem "jekyll-seo-tag"
 gem "jekyll-relative-links"
 gem "jekyll-sitemap"
 gem "jekyll-redirect-from"
+
+group :development, :test do
+  gem "html-proofer", "~> 5.0"
+end

@@ -22,4 +22,3 @@ read-only by default.
 external-finance-API domain. Related: [shushu](/shushu/),
 [office-agent](/office-agent/).
 
-[Reference →](reference/)

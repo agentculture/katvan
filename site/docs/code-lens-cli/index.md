@@ -19,4 +19,4 @@ than ripgrep, narrower than reading the whole tree.
 **Where it sits.** *Workspace Experience.* The read-side companion to the
 afi contract. Related: [afi-cli](/afi-cli/), [irc-lens](/irc-lens/).
 
-[Reference →](reference/)
+[Reference →](/docs/code-lens-cli/reference/)

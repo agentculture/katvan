@@ -19,4 +19,3 @@ Early-stage; treat output as a second opinion, not a gate.
 **Where it sits.** *Resident Domain.* A domain-serving agent — the
 security domain. Related: [ghafi](/ghafi/), [steward](/steward/).
 
-[Reference →](reference/)

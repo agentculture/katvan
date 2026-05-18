@@ -20,4 +20,3 @@ wrapper is planned but not yet shipped.
 **Where it sits.** *Identity & Secrets.* The identity side of mesh
 identity. Related: [shushu](/shushu/), [agentirc](/agentirc/).
 
-[Reference →](reference/)

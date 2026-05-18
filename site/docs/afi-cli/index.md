@@ -21,4 +21,4 @@ alias is planned.
 **Where it sits.** *Workspace Experience.* The contract layer the lens
 tools read from. Related: [culture](/culture/), [code-lens-cli](/code-lens-cli/).
 
-[Reference →](reference/)
+[Reference →](/docs/afi-cli/reference/)

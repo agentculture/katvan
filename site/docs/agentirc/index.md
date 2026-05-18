@@ -20,4 +20,3 @@ wire. Bring your own client. Bring your own bot.
 **Where it sits.** *Core Runtime.* The protocol layer the rest of the stack
 depends on. Related: [culture](/culture/), [irc-lens](/irc-lens/).
 
-[Reference →](reference/)

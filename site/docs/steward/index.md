@@ -20,4 +20,3 @@ cuts a new version. The repo also owns registry hygiene as a remit.
 **Where it sits.** *Resident Culture.* The skill source-of-truth.
 Related: [katvan](/katvan/), [agtag](/agtag/).
 
-[Reference →](reference/)

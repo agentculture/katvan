@@ -21,4 +21,4 @@ CLI; also drives the docs-check workflow.
 **Where it sits.** *Resident Culture.* The site's resident docs agent.
 Related: [steward](/steward/), [cultureflare](/cultureflare/).
 
-[Reference →](reference/)
+[Reference →](/docs/katvan/reference/)

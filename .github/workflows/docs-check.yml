@@ -39,3 +39,17 @@ jobs:
         run: bundle exec jekyll build --config _config.base.yml,_config.culture.yml -d _site_culture --strict_front_matter
         env:
           JEKYLL_ENV: production
+
+      - name: Check internal links (advisory)
+        # Warn-only for now: 7 broken links remain in vendored sibling content
+        # (docs/attention.md, docs/coverage-baseline.md, docs/architecture/shared-vs-cited.md)
+        # whose `../pyproject.toml` / `superpowers/` paths are repo-relative
+        # and should be rewritten in the librarian import. Track via that work,
+        # then flip continue-on-error off.
+        working-directory: site
+        continue-on-error: true
+        run: |
+          bundle exec htmlproofer _site_culture \
+            --disable-external \
+            --allow-hash-href \
+            --ignore-urls "/^/agentirc/,/^/agex/,/^/afi/,/^/citation-cli/"

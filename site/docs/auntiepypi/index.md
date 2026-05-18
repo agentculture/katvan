@@ -20,4 +20,4 @@ them. Early-stage; the API will move.
 **Where it sits.** *Resident Culture.* The org's release plumbing.
 Related: [ghafi](/ghafi/), [steward](/steward/).
 
-[Reference →](reference/)
+[Reference →](/docs/auntiepypi/reference/)
